@@ -1,6 +1,6 @@
 package kg.nurtelecom.text_recognizer
 
-object MrzHelper {
+object KgMrzHelper {
 
     private val RAW_MRZ_FIRST_LINE_REGEX = "([1I])(DK)([G6])(Z)(AN|ID|1D)(O|o|О|о|[0-9])[0-9]{7}".toRegex()
 

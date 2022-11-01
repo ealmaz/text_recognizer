@@ -7,10 +7,47 @@
     tools:context=".MainActivity"
     android:orientation="vertical">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/viewFinder"
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recognized text"
+        android:textAppearance="@style/Chili.H7.Marked.Bold"
+        android:layout_marginHorizontal="@dimen/padding_16dp"
+        android:layout_marginTop="@dimen/padding_32dp"
+        android:layout_marginBottom="@dimen/padding_8dp"/>
+
+    <TextView
+        android:id="@+id/tv_mrz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recognized text"
+        android:textAppearance="@style/Chili.H7.Primary"
+        android:layout_marginHorizontal="@dimen/padding_16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Image"
+        android:textAppearance="@style/Chili.H7.Marked.Bold"
+        android:layout_marginHorizontal="@dimen/padding_16dp"
+        android:layout_marginTop="@dimen/padding_32dp"
+        android:layout_marginBottom="@dimen/padding_8dp"/>
+
+    <ImageView
+        android:id="@+id/iv_image"
+        android:layout_width="200dp"
+        android:layout_height="250dp"
+        android:scaleType="centerCrop"
+        android:text="Recognized text"
+        android:textAppearance="@style/Chili.H7.Primary"
+        android:layout_marginHorizontal="@dimen/padding_16dp"/>
+
+    <Button
+        android:id="@+id/btn"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_height="wrap_content"
+        android:text="Recognize mrz"
+        android:layout_margin="@dimen/padding_16dp"
+        style="@style/Chili.ButtonStyle.Primary"/>
 
 </LinearLayout>

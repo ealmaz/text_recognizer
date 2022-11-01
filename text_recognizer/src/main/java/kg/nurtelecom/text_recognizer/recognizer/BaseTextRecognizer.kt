@@ -1,7 +1,6 @@
-package kg.nurtelecom.text_recognizer.base
+package kg.nurtelecom.text_recognizer.recognizer
 
 import android.media.Image
-import android.util.Log
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -20,10 +19,6 @@ abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizer
         currentImage = image
         initTextRecognizer()
         proceedImage()
-    }
-
-    fun cancelRecognition() {
-        onDestroy()
     }
 
     protected abstract fun proceedImage()
