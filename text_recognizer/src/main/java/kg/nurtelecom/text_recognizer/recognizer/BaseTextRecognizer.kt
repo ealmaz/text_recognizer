@@ -23,6 +23,10 @@ abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizer
 
     protected abstract fun proceedImage()
 
+    fun stopRecognition() {
+        onDestroy()
+    }
+
     private fun initTextRecognizer() {
         if (recognizer == null) {
             recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)

@@ -52,6 +52,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         object : CountDownTimer(15000, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish() {
+                imageAnalyzer.stopAnalyzing()
                 onFailTextRecognized(Exception())
             }
         }
@@ -181,8 +182,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
 
-
-        val tempFile = createTemporaryFiles(requireContext(), name, ".jpg")
+        val tempFile = createTemporaryFiles(name, ".jpg")
 
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(tempFile)
@@ -221,12 +221,13 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        imageAnalyzer.stopAnalyzing()
         cameraExecutor.shutdown()
         countDownTimer.cancel()
         _vb = null
     }
 
-    private fun createTemporaryFiles(context : Context?, prefix: String, suffix: String) : File {
+    private fun createTemporaryFiles(prefix: String, suffix: String) : File {
         val directory = when (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
             true -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/text_recognizer")
             else -> File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/text_recognizer")

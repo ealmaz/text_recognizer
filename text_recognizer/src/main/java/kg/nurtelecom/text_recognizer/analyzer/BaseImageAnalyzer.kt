@@ -19,6 +19,10 @@ abstract class BaseImageAnalyzer(protected val listener: ImageAnalyzerCallback)
         }
     }
 
+    fun stopAnalyzing() {
+        recognizer.stopRecognition()
+    }
+
     override fun requestNewImage() {
         imageProxy?.close()
     }
