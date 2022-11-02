@@ -19,6 +19,7 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.google.common.util.concurrent.ListenableFuture
 import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
@@ -34,6 +35,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     private var _vb: FragmentPhotoCaptureBinding? = null
     private val vb: FragmentPhotoCaptureBinding
         get () = _vb!!
+
+    private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
 
     private var imageCapture: ImageCapture? = null
 
@@ -85,9 +88,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private fun startCamera() {
         vb.surfacePreview.post {
-            val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-            cameraProviderFuture.addListener({
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+            cameraProviderFuture?.addListener({
+                val cameraProvider: ProcessCameraProvider = cameraProviderFuture?.get() ?: return@addListener
                 bindUseCases(cameraProvider)
             }, ContextCompat.getMainExecutor(requireContext()))
         }
@@ -221,6 +224,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        cameraProviderFuture = null
         imageAnalyzer.stopAnalyzing()
         cameraExecutor.shutdown()
         countDownTimer.cancel()
