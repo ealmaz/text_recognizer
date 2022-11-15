@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import kg.nurtelecom.text_recognizer.databinding.FragmentPhotoConfirmationBinding
+import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoConfirmationBinding
 
 class PhotoConfirmationFragment : Fragment() {
 
@@ -14,8 +14,8 @@ class PhotoConfirmationFragment : Fragment() {
         arguments?.getParcelable(ARG_FILE_URI) as? Uri
     }
 
-    private var _vb: FragmentPhotoConfirmationBinding? = null
-    val vb: FragmentPhotoConfirmationBinding
+    private var _vb: TextRecognizerFragmentPhotoConfirmationBinding? = null
+    val vb: TextRecognizerFragmentPhotoConfirmationBinding
         get() = _vb!!
 
     override fun onCreateView(
@@ -23,7 +23,7 @@ class PhotoConfirmationFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _vb = FragmentPhotoConfirmationBinding.inflate(inflater, container, false)
+        _vb = TextRecognizerFragmentPhotoConfirmationBinding.inflate(inflater, container, false)
         return vb.root
     }
 

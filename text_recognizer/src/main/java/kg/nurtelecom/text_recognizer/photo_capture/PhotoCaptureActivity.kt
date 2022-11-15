@@ -17,7 +17,7 @@ class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_photo_capture)
+        setContentView(R.layout.text_recognizer_activity_photo_capture)
         openCameraFragment()
     }
 
@@ -60,7 +60,7 @@ class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
 
     private fun startFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.container, fragment)
+            .replace(R.id.text_recognizer_container, fragment)
             .commit()
     }
 

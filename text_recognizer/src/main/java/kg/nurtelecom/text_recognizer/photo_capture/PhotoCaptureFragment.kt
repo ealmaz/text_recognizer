@@ -23,7 +23,7 @@ import com.google.common.util.concurrent.ListenableFuture
 import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
-import kg.nurtelecom.text_recognizer.databinding.FragmentPhotoCaptureBinding
+import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoCaptureBinding
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -32,8 +32,8 @@ import java.util.concurrent.Executors
 
 class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
-    private var _vb: FragmentPhotoCaptureBinding? = null
-    private val vb: FragmentPhotoCaptureBinding
+    private var _vb: TextRecognizerFragmentPhotoCaptureBinding? = null
+    private val vb: TextRecognizerFragmentPhotoCaptureBinding
         get () = _vb!!
 
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
@@ -69,7 +69,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        _vb =  FragmentPhotoCaptureBinding.inflate(layoutInflater)
+        _vb = TextRecognizerFragmentPhotoCaptureBinding.inflate(layoutInflater)
         return vb.root
     }
 
@@ -236,9 +236,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             true -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/text_recognizer")
             else -> File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/text_recognizer")
         }
-        when {
-            directory.exists() -> directory.listFiles()?.forEach { it.deleteRecursively() }
-            else -> directory.mkdirs()
+        if (!directory.exists()) {
+            directory.mkdirs()
         }
         return File.createTempFile(prefix, suffix, directory)
     }
