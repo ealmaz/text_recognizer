@@ -2,6 +2,7 @@ package kg.nurtelecom.text_recognizer.analyzer
 
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.recognizer.BaseTextRecognizer
 import kg.nurtelecom.text_recognizer.recognizer.TextRecognizerCallback
 
@@ -27,7 +28,7 @@ abstract class BaseImageAnalyzer(protected val listener: ImageAnalyzerCallback)
         imageProxy?.close()
     }
 
-    override fun onSuccessRecognized(result: String) {
+    override fun onSuccessRecognized(result: RecognizedMrz) {
         listener.onSuccessTextRecognized(result)
     }
 
@@ -38,6 +39,6 @@ abstract class BaseImageAnalyzer(protected val listener: ImageAnalyzerCallback)
 
 
 interface ImageAnalyzerCallback {
-    fun onSuccessTextRecognized(result: String)
+    fun onSuccessTextRecognized(result: RecognizedMrz)
     fun onFailTextRecognized(ex: Exception)
 }

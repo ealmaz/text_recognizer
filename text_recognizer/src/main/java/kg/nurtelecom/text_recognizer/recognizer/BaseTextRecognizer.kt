@@ -4,6 +4,7 @@ import android.media.Image
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kg.nurtelecom.text_recognizer.RecognizedMrz
 
 abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizerCallback) {
 
@@ -33,7 +34,7 @@ abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizer
         }
     }
 
-    protected fun onSuccessRecognized(result: String) {
+    protected fun onSuccessRecognized(result: RecognizedMrz) {
         recognizerCallback.onSuccessRecognized(result)
         onDestroy()
     }
@@ -58,6 +59,6 @@ abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizer
 
 interface TextRecognizerCallback {
     fun requestNewImage()
-    fun onSuccessRecognized(result: String)
+    fun onSuccessRecognized(result: RecognizedMrz)
     fun onRecognitionFail(ex: Exception)
 }

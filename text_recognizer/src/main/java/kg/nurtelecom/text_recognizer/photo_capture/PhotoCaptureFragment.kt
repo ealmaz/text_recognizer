@@ -19,7 +19,9 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.google.common.util.concurrent.ListenableFuture
+import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
@@ -98,7 +100,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private fun bindUseCases(cameraProvider: ProcessCameraProvider) {
 
-        val aspectRatio = when (requireActivity().resources.configuration.orientation) {
+        val aspectRatio = when (tryGetActivity().resources.configuration.orientation) {
             Configuration.ORIENTATION_PORTRAIT -> AspectRatio.RATIO_4_3
             else -> AspectRatio.RATIO_16_9
         }
@@ -169,7 +171,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private fun setupViews() {
         vb.btnClose.setOnClickListener {
-            (requireActivity() as PhotoCaptureActivityCallback).closeActivity()
+            (tryGetActivity() as PhotoCaptureActivityCallback).closeActivity()
         }
         vb.btnCapture.apply {
             setOnClickListener { takePhoto() }
@@ -200,7 +202,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults){
-                    (requireActivity() as PhotoCaptureActivityCallback).openPhotoConfirmationFragment(
+                    (tryGetActivity() as PhotoCaptureActivityCallback).openPhotoConfirmationFragment(
                         output.savedUri
                     )
                 }
@@ -209,12 +211,20 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     }
 
-    private fun onPermissionDenied() {
-        (requireActivity() as PhotoCaptureActivityCallback).onPermissionsDenied()
+    private fun tryGetActivity(): FragmentActivity {
+        while (true) {
+            activity?.let {
+                return it
+            }
+        }
     }
 
-    override fun onSuccessTextRecognized(result: String) {
-        (requireActivity() as PhotoCaptureActivityCallback).onMrzRecognized(result)
+    private fun onPermissionDenied() {
+        (tryGetActivity() as PhotoCaptureActivityCallback).onPermissionsDenied()
+    }
+
+    override fun onSuccessTextRecognized(result: RecognizedMrz) {
+        (tryGetActivity() as PhotoCaptureActivityCallback).onMrzRecognized(result)
         takePhoto()
     }
 

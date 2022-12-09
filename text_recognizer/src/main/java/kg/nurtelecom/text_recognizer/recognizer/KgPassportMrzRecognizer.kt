@@ -24,8 +24,9 @@ class KgPassportMrzRecognizer(recognizerCallback: TextRecognizerCallback) : Base
     private fun validateMrz(rawText: Text) {
         val lines = rawText.textBlocks.map { it.text }
         val mrz = KgMrzHelper.parseMrzFromRawText(lines)
-        if (KgMrzHelper.isMrzValid(mrz)) {
-            onSuccessRecognized(mrz)
+        val result = KgMrzHelper.isMrzValid(mrz)
+        if (result != null) {
+            onSuccessRecognized(result)
         } else {
             proceedImage()
         }

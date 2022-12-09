@@ -10,12 +10,12 @@ import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoConf
 
 class PhotoConfirmationFragment : Fragment() {
 
-    val photoUri: Uri? by lazy {
+    private val photoUri: Uri? by lazy {
         arguments?.getParcelable(ARG_FILE_URI) as? Uri
     }
 
     private var _vb: TextRecognizerFragmentPhotoConfirmationBinding? = null
-    val vb: TextRecognizerFragmentPhotoConfirmationBinding
+    private val vb: TextRecognizerFragmentPhotoConfirmationBinding
         get() = _vb!!
 
     override fun onCreateView(

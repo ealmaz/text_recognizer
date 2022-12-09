@@ -3,6 +3,7 @@ package kg.nurtelecom.textrecognizer
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoCaptureActivity
 import kg.nurtelecom.text_recognizer.photo_capture.RecognizePhotoContract
 import kg.nurtelecom.textrecognizer.databinding.ActivityMainBinding
@@ -14,17 +15,9 @@ class MainActivity : AppCompatActivity() {
         it?.getParcelableExtra<Uri>(PhotoCaptureActivity.EXTRA_PHOTO_URI)?.let {
            viewBinding.ivImage.setImageURI(it)
         }
-        it?.getStringExtra(PhotoCaptureActivity.EXTRA_MRZ_STRING)?.let {
-            val result = StringBuilder()
-            result.append("Mrz: ")
-            result.append(it)
-            result.append("\n\n")
-            result.append("INN: ")
-            result.append(getInnFromMrz(it))
-            result.append("\n")
-            result.append("Passport number: ")
-            result.append(getPassportNumberFromMrz(it))
-            viewBinding.tvMrz.setText(result.toString())
+        it?.getSerializableExtra(PhotoCaptureActivity.EXTRA_MRZ_STRING)?.let {
+
+            viewBinding.tvMrz.setText((it as RecognizedMrz).toString())
         } ?: let {
             viewBinding.tvMrz.text = "Unable to recognize MRZ"
         }

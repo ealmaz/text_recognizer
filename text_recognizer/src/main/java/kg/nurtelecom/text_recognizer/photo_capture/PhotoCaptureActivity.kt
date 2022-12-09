@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import kg.nurtelecom.text_recognizer.R
+import kg.nurtelecom.text_recognizer.RecognizedMrz
 
 class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
 
@@ -39,7 +40,7 @@ class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
         closeActivityWithData()
     }
 
-    override fun onMrzRecognized(result: String) {
+    override fun onMrzRecognized(result: RecognizedMrz) {
         resultDataIntent.putExtra(EXTRA_MRZ_STRING, result)
     }
 
@@ -77,7 +78,7 @@ interface PhotoCaptureActivityCallback {
     fun openPhotoConfirmationFragment(uri: Uri?)
     fun openCameraFragment(needRecognition: Boolean = true)
     fun onPhotoConfirmed(uri: Uri)
-    fun onMrzRecognized(result: String)
+    fun onMrzRecognized(result: RecognizedMrz)
     fun closeActivity()
     fun closeActivityWithData()
     fun onPermissionsDenied()
