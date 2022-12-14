@@ -1,7 +1,6 @@
 package kg.nurtelecom.text_recognizer.photo_capture
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
@@ -13,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -171,7 +169,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private fun setupViews() {
         vb.btnClose.setOnClickListener {
-            (tryGetActivity() as PhotoCaptureActivityCallback).closeActivity()
+            (tryGetActivity() as PhotoRecognizerActivityCallback).closeActivity()
         }
         vb.btnCapture.apply {
             setOnClickListener { takePhoto() }
@@ -202,7 +200,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults){
-                    (tryGetActivity() as PhotoCaptureActivityCallback).openPhotoConfirmationFragment(
+                    (tryGetActivity() as PhotoRecognizerActivityCallback).openPhotoConfirmationFragment(
                         output.savedUri
                     )
                 }
@@ -220,11 +218,11 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private fun onPermissionDenied() {
-        (tryGetActivity() as PhotoCaptureActivityCallback).onPermissionsDenied()
+        (tryGetActivity() as PhotoRecognizerActivityCallback).onPermissionsDenied()
     }
 
     override fun onSuccessTextRecognized(result: RecognizedMrz) {
-        (tryGetActivity() as PhotoCaptureActivityCallback).onMrzRecognized(result)
+        (tryGetActivity() as PhotoRecognizerActivityCallback).onMrzRecognized(result)
         takePhoto()
     }
 

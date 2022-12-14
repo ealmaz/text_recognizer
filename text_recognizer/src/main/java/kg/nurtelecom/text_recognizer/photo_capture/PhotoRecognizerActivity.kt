@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 
-class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
+class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback {
 
     private val resultDataIntent: Intent = Intent()
 
@@ -77,7 +77,7 @@ class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
     }
 }
 
-interface PhotoCaptureActivityCallback {
+interface PhotoRecognizerActivityCallback {
     fun openPhotoConfirmationFragment(uri: Uri?)
     fun openCameraFragment(needRecognition: Boolean = true)
     fun onPhotoConfirmed(uri: Uri)
@@ -89,7 +89,7 @@ interface PhotoCaptureActivityCallback {
 
 class RecognizePhotoContract : ActivityResultContract<Unit, Intent?>() {
     override fun createIntent(context: Context, input: Unit): Intent {
-        return Intent(context, PhotoCaptureActivity::class.java)
+        return Intent(context, PhotoRecognizerActivity::class.java)
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Intent? {

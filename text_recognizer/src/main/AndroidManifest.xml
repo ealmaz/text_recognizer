@@ -13,7 +13,7 @@
     <application>
 
         <activity
-            android:name=".photo_capture.PhotoCaptureActivity"
+            android:name=".photo_capture.PhotoRecognizerActivity"
             android:screenOrientation="portrait" />
 
     </application>

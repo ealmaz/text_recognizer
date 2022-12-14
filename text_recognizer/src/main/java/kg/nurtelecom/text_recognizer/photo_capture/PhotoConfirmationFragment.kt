@@ -33,14 +33,14 @@ class PhotoConfirmationFragment : Fragment() {
             vb.ivPhoto.setImageURI(it)
         }
         vb.btnSecondary.setOnClickListener {
-            (requireActivity() as PhotoCaptureActivityCallback).openCameraFragment(false)
+            (requireActivity() as PhotoRecognizerActivityCallback).openCameraFragment(false)
         }
         vb.btnPrimary.setOnClickListener {
-            photoUri?.let {(requireActivity() as PhotoCaptureActivityCallback).onPhotoConfirmed(it)}
-            (requireActivity() as PhotoCaptureActivityCallback).closeActivityWithData()
+            photoUri?.let {(requireActivity() as PhotoRecognizerActivityCallback).onPhotoConfirmed(it)}
+            (requireActivity() as PhotoRecognizerActivityCallback).closeActivityWithData()
         }
         vb.btnClose.setOnClickListener {
-            (requireActivity() as PhotoCaptureActivityCallback).closeActivity()
+            (requireActivity() as PhotoRecognizerActivityCallback).closeActivity()
         }
 
     }

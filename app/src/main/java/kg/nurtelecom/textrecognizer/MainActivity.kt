@@ -4,18 +4,17 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import kg.nurtelecom.text_recognizer.RecognizedMrz
-import kg.nurtelecom.text_recognizer.photo_capture.PhotoCaptureActivity
+import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity
 import kg.nurtelecom.text_recognizer.photo_capture.RecognizePhotoContract
 import kg.nurtelecom.textrecognizer.databinding.ActivityMainBinding
-import java.lang.StringBuilder
 
 class MainActivity : AppCompatActivity() {
 
     val textRecognizerContract = registerForActivityResult(RecognizePhotoContract()) {
-        it?.getParcelableExtra<Uri>(PhotoCaptureActivity.EXTRA_PHOTO_URI)?.let {
+        it?.getParcelableExtra<Uri>(PhotoRecognizerActivity.EXTRA_PHOTO_URI)?.let {
            viewBinding.ivImage.setImageURI(it)
         }
-        it?.getSerializableExtra(PhotoCaptureActivity.EXTRA_MRZ_STRING)?.let {
+        it?.getSerializableExtra(PhotoRecognizerActivity.EXTRA_MRZ_STRING)?.let {
 
             viewBinding.tvMrz.setText((it as RecognizedMrz).toString())
         } ?: let {
