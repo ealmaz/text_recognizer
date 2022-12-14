@@ -19,7 +19,8 @@ class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.text_recognizer_activity_photo_capture)
-        openCameraFragment()
+        val needRecognition = intent.getBooleanExtra(NEED_RECOGNITION_INTENT_DATA, true)
+        openCameraFragment(needRecognition)
     }
 
     override fun openCameraFragment(needRecognition: Boolean) {
@@ -66,6 +67,8 @@ class PhotoCaptureActivity : AppCompatActivity(), PhotoCaptureActivityCallback {
     }
 
     companion object {
+
+        const val NEED_RECOGNITION_INTENT_DATA = "need_recognition"
 
         const val RESULT_PERMISSION_DENIED = 100
 
