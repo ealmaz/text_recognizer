@@ -6,31 +6,52 @@
 
     <ImageView
         android:id="@+id/btn_close"
-        android:layout_width="@dimen/view_24dp"
-        android:layout_height="@dimen/view_24dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:layout_marginStart="@dimen/padding_16dp"
         android:layout_marginTop="@dimen/padding_16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:background="@drawable/text_recognizer_ic_close"
         android:backgroundTint="@color/white_1"
-        android:elevation="5dp"/>
+        android:elevation="5dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/surface_preview"
+    <FrameLayout
+        android:id="@+id/fl_preview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/surface_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/btn_capture"
-        android:layout_width="@dimen/view_64dp"
-        android:layout_height="@dimen/view_64dp"
-        android:layout_marginBottom="@dimen/padding_16dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_marginBottom="@dimen/padding_24dp"
         android:src="@drawable/text_recognizer_capture_button"
-        android:clickable="true"
-        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+    <TextView
+        android:id="@+id/tv_description"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_24dp"
+        android:background="@drawable/chili_card_rounded_background"
+        android:text="@string/recognition_description"
+        android:gravity="center"
+        android:padding="@dimen/padding_8dp"
         android:visibility="gone"
-        android:background="?selectableItemBackgroundBorderless"
+        android:layout_marginHorizontal="@dimen/padding_16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

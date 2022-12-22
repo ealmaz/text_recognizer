@@ -3,6 +3,8 @@ package kg.nurtelecom.textrecognizer
 import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity
 import kg.nurtelecom.text_recognizer.photo_capture.RecognizePhotoContract
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMainBinding.inflate(layoutInflater)
+        AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         setContentView(viewBinding.root)
         viewBinding.btn.setOnClickListener {
             textRecognizerContract.launch(Unit)

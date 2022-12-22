@@ -39,10 +39,6 @@ class PhotoConfirmationFragment : Fragment() {
             photoUri?.let {(requireActivity() as PhotoRecognizerActivityCallback).onPhotoConfirmed(it)}
             (requireActivity() as PhotoRecognizerActivityCallback).closeActivityWithData()
         }
-        vb.btnClose.setOnClickListener {
-            (requireActivity() as PhotoRecognizerActivityCallback).closeActivity()
-        }
-
     }
 
     override fun onDestroyView() {

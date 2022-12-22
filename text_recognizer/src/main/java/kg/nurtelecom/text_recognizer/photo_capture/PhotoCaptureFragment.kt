@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -24,6 +25,7 @@ import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoCaptureBinding
+import kg.nurtelecom.text_recognizer.overlay.BlackRectangleOverlay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -111,6 +113,14 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             .build()
             .also { it.setSurfaceProvider(vb.surfacePreview.surfaceProvider) }
 
+        vb.flPreview.addView(
+            BlackRectangleOverlay(requireContext()),
+            FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+
         imageCapture = ImageCapture.Builder()
             .setTargetRotation(rotation)
             .setTargetAspectRatio(aspectRatio)
@@ -173,9 +183,15 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         }
         vb.btnCapture.apply {
             setOnClickListener { takePhoto() }
-            visibility = when (needToRecognizeText) {
-                true -> View.GONE
-                else -> View.VISIBLE
+            when (needToRecognizeText) {
+                true -> {
+                    visibility = View.GONE
+                    vb.tvDescription.visibility = View.VISIBLE
+                }
+                else -> {
+                    visibility = View.VISIBLE
+                    vb.tvDescription.visibility = View.GONE
+                }
             }
         }
     }
