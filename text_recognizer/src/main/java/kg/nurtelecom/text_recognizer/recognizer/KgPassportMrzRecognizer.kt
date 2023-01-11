@@ -2,7 +2,7 @@ package kg.nurtelecom.text_recognizer.recognizer
 
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.Text
-import kg.nurtelecom.text_recognizer.KgMrzHelper
+import kg.nurtelecom.text_recognizer.MrzHelper
 
 class KgPassportMrzRecognizer(recognizerCallback: TextRecognizerCallback) : BaseTextRecognizer(recognizerCallback) {
 
@@ -23,8 +23,8 @@ class KgPassportMrzRecognizer(recognizerCallback: TextRecognizerCallback) : Base
 
     private fun validateMrz(rawText: Text) {
         val lines = rawText.textBlocks.map { it.text }
-        val mrz = KgMrzHelper.parseMrzFromRawText(lines)
-        val result = KgMrzHelper.isMrzValid(mrz)
+        val mrz = MrzHelper.parseMrzFromRawText(lines)
+        val result = MrzHelper.isMrzValid(mrz)
         if (result != null) {
             onSuccessRecognized(result)
         } else {

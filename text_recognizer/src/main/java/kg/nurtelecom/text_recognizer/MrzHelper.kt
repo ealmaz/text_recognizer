@@ -2,23 +2,21 @@ package kg.nurtelecom.text_recognizer
 
 import java.lang.StringBuilder
 
-object KgMrzHelper {
-
-    private val RAW_MRZ_FIRST_LINE_REGEX = "([1I])(DK)([G6])(Z)(AN|ID|1D)(O|o|О|о|[0-9])[0-9]{7}".toRegex()
+object MrzHelper {
 
     private val numbersWeights = listOf(7, 3, 1)
 
     fun parseMrzFromRawText(rawTextLines: List<String>): String {
-        var mrzBlock = ""
+        var mrzBlock = mutableListOf<String>()
         rawTextLines.forEach { block ->
             val text = block.replace(" ", "")
             text.split("\n").forEach { line ->
-                if ((line.length == 44 || line.length == 36 ||  line.length == 30) && line.matches("[a-zA-Z0-9<]*".toRegex())) {
-                    mrzBlock += line
+                if (line.length == 44 || line.length == 36 ||  line.length == 30) {
+                    mrzBlock.add(line)
                 }
             }
         }
-        return prepareMrz(mrzBlock)
+        return prepareMrz(mrzBlock.joinToString(separator = "") { it })
     }
 
     private fun prepareMrz(rawMrz: String): String {
@@ -31,10 +29,9 @@ object KgMrzHelper {
 
     fun isMrzValid(mrz: String): RecognizedMrz? {
         return when (mrz.length) {
-            90 -> validateTd1(mrz)
             72 -> validateTd2(mrz)
             88 -> validateTd3(mrz)
-            else -> null
+            else -> validateTd1(mrz)
         }
     }
 
