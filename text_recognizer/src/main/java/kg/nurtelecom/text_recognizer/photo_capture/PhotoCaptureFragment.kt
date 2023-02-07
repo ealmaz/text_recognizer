@@ -54,7 +54,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         get () = arguments?.getBoolean(ARG_NEED_RECOGNITION) ?: true
 
     private val countDownTimer: CountDownTimer by lazy {
-        object : CountDownTimer(15000, 1000) {
+        object : CountDownTimer(20000, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish() {
                 imageAnalyzer.stopAnalyzing()
