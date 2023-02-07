@@ -100,10 +100,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private fun bindUseCases(cameraProvider: ProcessCameraProvider) {
 
-        val aspectRatio = when (tryGetActivity().resources.configuration.orientation) {
-            Configuration.ORIENTATION_PORTRAIT -> AspectRatio.RATIO_4_3
-            else -> AspectRatio.RATIO_16_9
-        }
+        val aspectRatio = AspectRatio.RATIO_16_9
 
         val rotation = vb.surfacePreview.display.rotation
 
