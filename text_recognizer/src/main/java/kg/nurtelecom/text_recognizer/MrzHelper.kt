@@ -37,7 +37,7 @@ object MrzHelper {
 
     private fun validateTd1(mrz: String): RecognizedMrz? {
         var lastWeightIndex = 0
-        if (mrz.length < 60) return null
+        if (mrz.length < 90) return null
         val lastControlNumber = mrz[59]
         var sum = 0
         val mrzShort = StringBuilder()
