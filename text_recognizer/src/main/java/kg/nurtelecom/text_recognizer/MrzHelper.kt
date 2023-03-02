@@ -21,6 +21,7 @@ object MrzHelper {
 
     private fun prepareMrz(rawMrz: String): String {
         return rawMrz
+            .replace("((?![A-Za-z0-9<]).)".toRegex(), "")
             .replace("\n", "")
             .replace("1D", "ID")
             .replace("(K6Z|K62|KG2)".toRegex(), "KGZ")
