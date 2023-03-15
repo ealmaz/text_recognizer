@@ -38,16 +38,49 @@ object MrzHelper {
     }
 
     private fun validateTd1(mrz: String): RecognizedMrz? {
-        var lastWeightIndex = 0
         if (mrz.length < 90) return null
         val lastControlNumber = mrz[59]
+
+        // Check first line -> 14(check number index): 5-14 (number sequence, index from - index to + 1)
+        if (checkControlSum(mrz.subSequence(5, 14), Character.getNumericValue(mrz[14])).not()) return null
+
+        // Check second line -> 36: 30-36
+        if (checkControlSum(mrz.subSequence(30, 36), Character.getNumericValue(mrz[36])).not()) return null
+
+        // Check second line -> 44: 38-44
+        if (checkControlSum(mrz.subSequence(38, 44), Character.getNumericValue(mrz[44])).not()) return null
+
+        // Main control number
+        val mainSequence = StringBuilder()
+        mainSequence.append(mrz.subSequence(5, 30))
+        mainSequence.append(mrz.subSequence(30, 37))
+        mainSequence.append(mrz.subSequence(38, 45))
+        mainSequence.append(mrz.subSequence(48, 59))
+
+        val mainControlNumber = Character.getNumericValue(lastControlNumber)
+        if (checkControlSum(mainSequence.toString(), mainControlNumber).not()) return null
+
+        return RecognizedMrz(
+            mrz,
+            mrz.substring(1, 2),
+            mrz.substring(2, 5),
+            mrz.substring(5, 14),
+            mrz.substring(30, 36),
+            mrz.substring(37, 38),
+            mrz.substring(38, 44),
+            mrz.substring(45, 48),
+            null,
+            null,
+            mrz.substring(15, 30),
+            mrz.substring(48, 59)
+
+        )
+    }
+
+    private fun checkControlSum(sequence: CharSequence, controlSum: Int): Boolean {
         var sum = 0
-        val mrzShort = StringBuilder()
-        mrzShort.append(mrz.subSequence(5, 30))
-        mrzShort.append(mrz.subSequence(30, 37))
-        mrzShort.append(mrz.subSequence(38, 45))
-        mrzShort.append(mrz.subSequence(48, 59))
-        mrzShort.forEach {
+        var lastWeightIndex = 0
+        sequence.forEach {
             val num =  when (isNumber(it)) {
                 true -> Character.getNumericValue(it)
                 else -> getLetterAlphabetPosition(it)
@@ -59,85 +92,69 @@ object MrzHelper {
             }
             sum += (num * wei)
         }
-        return if (sum % 10 == Character.getNumericValue(lastControlNumber)) {
-          RecognizedMrz(
-              mrz,
-              mrz.substring(1, 2),
-              mrz.substring(2, 5),
-              mrz.substring(5, 14),
-              mrz.substring(30, 36),
-              mrz.substring(37, 38),
-              mrz.substring(38, 44),
-              mrz.substring(45, 48),
-              null,
-              null,
-              mrz.substring(15, 30),
-              mrz.substring(48, 59)
-
-          )
-        } else null
+        return sum % 10 == controlSum
     }
 
     private fun validateTd2(mrz: String): RecognizedMrz? {
-        var lastWeightIndex = 0
         if (mrz.length < 72) return null
+
+
+        if (checkControlSum(mrz.subSequence(36, 45), Character.getNumericValue(mrz[45])).not()) return null
+
+        if (checkControlSum(mrz.subSequence(49, 55), Character.getNumericValue(mrz[55])).not()) return null
+
+        if (checkControlSum(mrz.subSequence(57, 63), Character.getNumericValue(mrz[63])).not()) return null
+
+
         val lastControlNumber = mrz[71]
-        var sum = 0
         val mrzShort = StringBuilder()
-        mrzShort.append(mrz.subSequence(36, 71))
-        mrzShort.forEach {
-            val num =  when (isNumber(it)) {
-                true -> Character.getNumericValue(it)
-                else -> getLetterAlphabetPosition(it)
-            }
-            val wei = getNumberWeight(lastWeightIndex)
-            lastWeightIndex++
-            if (lastWeightIndex >= 3) {
-                lastWeightIndex = 0
-            }
-            sum += (num * wei)
-        }
-        return if (sum % 10 == Character.getNumericValue(lastControlNumber)) {
-            RecognizedMrz(
-                mrz,
-                mrz.substring(1, 2),
-                mrz.substring(2, 5),
-                mrz.substring(36, 45),
-                mrz.substring(49, 55),
-                mrz.substring(56, 57),
-                mrz.substring(57, 63),
-                mrz.substring(46, 49),
-                null,
-                null,
-                mrz.substring(64, 71),
-                null
-            )
-        } else null
+        mrzShort.append(mrz.subSequence(36, 46))
+        mrzShort.append(mrz.subSequence(49, 56))
+        mrzShort.append(mrz.subSequence(57, 71))
+
+        val mainControlNumber = Character.getNumericValue(lastControlNumber)
+        if (checkControlSum(mrzShort.toString(), mainControlNumber).not()) return null
+
+
+        return RecognizedMrz(
+            mrz,
+            mrz.substring(1, 2),
+            mrz.substring(2, 5),
+            mrz.substring(36, 45),
+            mrz.substring(49, 55),
+            mrz.substring(56, 57),
+            mrz.substring(57, 63),
+            mrz.substring(46, 49),
+            null,
+            null,
+            mrz.substring(64, 71),
+            null
+        )
     }
 
     private fun validateTd3(mrz: String): RecognizedMrz? {
-        var lastWeightIndex = 0
         if (mrz.length < 88) return null
+
+        if (checkControlSum(mrz.subSequence(44, 53), Character.getNumericValue(mrz[53])).not()) return null
+
+        if (checkControlSum(mrz.subSequence(57, 63), Character.getNumericValue(mrz[63])).not()) return null
+
+        if (checkControlSum(mrz.subSequence(65, 71), Character.getNumericValue(mrz[71])).not()) return null
+
+        if (checkControlSum(mrz.subSequence(72, 86), Character.getNumericValue(mrz[86])).not()) return null
+
+
+
+
         val lastControlNumber = mrz[87]
-        var sum = 0
         val mrzShort = StringBuilder()
         mrzShort.append(mrz.subSequence(44, 54))
         mrzShort.append(mrz.subSequence(57, 64))
         mrzShort.append(mrz.subSequence(65, 87))
-        mrzShort.forEach {
-            val num =  when (isNumber(it)) {
-                true -> Character.getNumericValue(it)
-                else -> getLetterAlphabetPosition(it)
-            }
-            val wei = getNumberWeight(lastWeightIndex)
-            lastWeightIndex++
-            if (lastWeightIndex >= 3) {
-                lastWeightIndex = 0
-            }
-            sum += (num * wei)
-        }
-        return if (sum % 10 == Character.getNumericValue(lastControlNumber)) {
-            RecognizedMrz(
+
+        if (checkControlSum(mrzShort.toString(), Character.getNumericValue(lastControlNumber)).not()) return null
+
+        return RecognizedMrz(
                 mrz,
                 mrz.substring(1, 2),
                 mrz.substring(2, 5),
@@ -150,7 +167,6 @@ object MrzHelper {
                 null,
                 mrz.substring(72, 86),
                 null)
-        } else null
     }
 
     private fun isNumber(char: Char): Boolean {
@@ -167,4 +183,9 @@ object MrzHelper {
     private fun getNumberWeight(position: Int): Int {
         return numbersWeights[position]
     }
+}
+
+fun main() {
+//    println(MrzHelper.isMrzValid("TyraxxepeMecTopawaevnPaceofbiIDKGZID0452854521410200100401<0110141M2712181KGZ<<<<<<<<<<<6A"))
+    println(MrzHelper.isMrzValid("IDKGZID1601490421401199301593<9301146M3002197KGZ<<<<<<<<<<<4SHERALY<UULU<<CHYNGYZ<<<<<<<<<"))
 }
