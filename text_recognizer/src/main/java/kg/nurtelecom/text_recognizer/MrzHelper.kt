@@ -32,7 +32,8 @@ object MrzHelper {
         return when (mrz.length) {
             72 -> validateTd2(mrz)
             88 -> validateTd3(mrz)
-            else -> validateTd1(mrz)
+            90 -> validateTd1(mrz)
+            else -> null
         }
     }
 
