@@ -8,9 +8,10 @@ import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity
 import kg.nurtelecom.text_recognizer.photo_capture.RecognizePhotoContract
+import kg.nurtelecom.text_recognizer.photo_capture.TextRecognizerConfig
 import kg.nurtelecom.textrecognizer.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class  MainActivity : AppCompatActivity() {
 
     val textRecognizerContract = registerForActivityResult(RecognizePhotoContract()) {
         it?.getParcelableExtra<Uri>(PhotoRecognizerActivity.EXTRA_PHOTO_URI)?.let {
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         setContentView(viewBinding.root)
         viewBinding.btn.setOnClickListener {
-            textRecognizerContract.launch(Unit)
+            textRecognizerContract.launch(null)
         }
     }
 

@@ -11,10 +11,15 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
+import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity.Companion.TEXT_RECOGNIZER_CONFIGS
 
 class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback {
 
     private val resultDataIntent: Intent = Intent()
+
+    private val textRecognizerConfig: TextRecognizerConfig? by lazy {
+        intent.getSerializableExtra(TEXT_RECOGNIZER_CONFIGS) as? TextRecognizerConfig
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +37,10 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
 
     override fun openPhotoConfirmationFragment(uri: Uri?) {
         val confirmationFragment = PhotoConfirmationFragment()
-        confirmationFragment.arguments = bundleOf(PhotoConfirmationFragment.ARG_FILE_URI to uri)
+        confirmationFragment.arguments = bundleOf(
+            PhotoConfirmationFragment.ARG_FILE_URI to uri,
+            PhotoConfirmationFragment.ARG_SHOULD_RECOGNIZE_ON_RETRY to (textRecognizerConfig?.shouldRecognizeOnRetry ?: false)
+        )
         startFragment(confirmationFragment)
     }
 
@@ -68,6 +76,8 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
 
     companion object {
 
+        const val TEXT_RECOGNIZER_CONFIGS = "text_recognizer_configs"
+
         const val NEED_RECOGNITION_INTENT_DATA = "need_recognition"
 
         const val RESULT_PERMISSION_DENIED = 100
@@ -87,9 +97,11 @@ interface PhotoRecognizerActivityCallback {
     fun onPermissionsDenied()
 }
 
-class RecognizePhotoContract : ActivityResultContract<Unit, Intent?>() {
-    override fun createIntent(context: Context, input: Unit): Intent {
-        return Intent(context, PhotoRecognizerActivity::class.java)
+class RecognizePhotoContract : ActivityResultContract<TextRecognizerConfig?, Intent?>() {
+    override fun createIntent(context: Context, input: TextRecognizerConfig?): Intent {
+        return Intent(context, PhotoRecognizerActivity::class.java).apply {
+            input?.let { putExtra(TEXT_RECOGNIZER_CONFIGS, input) }
+        }
     }
 
     override fun parseResult(resultCode: Int, intent: Intent?): Intent? {
@@ -97,3 +109,7 @@ class RecognizePhotoContract : ActivityResultContract<Unit, Intent?>() {
         return intent
     }
 }
+
+data class TextRecognizerConfig(
+    val shouldRecognizeOnRetry: Boolean
+): java.io.Serializable

@@ -14,6 +14,10 @@ class PhotoConfirmationFragment : Fragment() {
         arguments?.getParcelable(ARG_FILE_URI) as? Uri
     }
 
+    private val shouldRecognizeOnRetry: Boolean by lazy {
+        arguments?.getBoolean(ARG_SHOULD_RECOGNIZE_ON_RETRY) ?: false
+    }
+
     private var _vb: TextRecognizerFragmentPhotoConfirmationBinding? = null
     private val vb: TextRecognizerFragmentPhotoConfirmationBinding
         get() = _vb!!
@@ -33,7 +37,7 @@ class PhotoConfirmationFragment : Fragment() {
             vb.ivPhoto.setImageURI(it)
         }
         vb.btnSecondary.setOnClickListener {
-            (requireActivity() as PhotoRecognizerActivityCallback).openCameraFragment(false)
+            (requireActivity() as PhotoRecognizerActivityCallback).openCameraFragment(shouldRecognizeOnRetry)
         }
         vb.btnPrimary.setOnClickListener {
             photoUri?.let {(requireActivity() as PhotoRecognizerActivityCallback).onPhotoConfirmed(it)}
@@ -48,5 +52,6 @@ class PhotoConfirmationFragment : Fragment() {
 
     companion object {
         const val ARG_FILE_URI = "file_uri"
+        const val ARG_SHOULD_RECOGNIZE_ON_RETRY = "should_recognize_on_retry"
     }
 }
