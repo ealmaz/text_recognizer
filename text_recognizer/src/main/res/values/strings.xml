@@ -2,5 +2,9 @@
 <resources>
 
     <string name="recognition_description">Убедитесь, что данные легко читаются и отчетливо видны в пределах рамки</string>
+    <string name="yes_they_visible">Да, видны</string>
+    <string name="no_reshoot">Нет, переснять</string>
+    <string name="capture_confirmation_text">Данные отчетливо видны?</string>
+
 
 </resources>

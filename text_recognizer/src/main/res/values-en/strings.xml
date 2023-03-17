@@ -2,4 +2,7 @@
 <resources>
 
     <string name="recognition_description">Make sure that the data is easy to read and clearly visible within the frame.</string>
+    <string name="yes_they_visible">Yes, its visible</string>
+    <string name="no_reshoot">No, retake</string>
+    <string name="capture_confirmation_text">Is the data clearly visible?</string>
 </resources>
