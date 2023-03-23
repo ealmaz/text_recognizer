@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="recognition_description">Маалыматтар оңой окула тургандыгына жана көрсөтүлгөн алкактарда так көрүнүп жаткандыгына ынаныңыз.</string>
+    <string name="recognition_description">Маалыматтар алкактын чегинде көрүнүп турганына ынаныңыз. Маалыматтардын окулушун күтүңүз.</string>
     <string name="yes_they_visible">Ооба, көрүндү</string>
     <string name="no_reshoot">Жок, кайра тартуу керек</string>
     <string name="capture_confirmation_text">Маалыматтар так көрүнүп жатабы?</string>

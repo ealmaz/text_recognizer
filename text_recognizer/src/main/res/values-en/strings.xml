@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="recognition_description">Make sure that the data is easy to read and clearly visible within the frame.</string>
+    <string name="recognition_description">Make sure the information is visible within the frame. Wait for the information to be processed.</string>
     <string name="yes_they_visible">Yes, its visible</string>
     <string name="no_reshoot">No, retake</string>
     <string name="capture_confirmation_text">Is the data clearly visible?</string>
