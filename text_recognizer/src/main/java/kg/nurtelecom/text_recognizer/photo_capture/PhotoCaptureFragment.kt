@@ -13,6 +13,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -38,6 +39,18 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     private val vb: TextRecognizerFragmentPhotoCaptureBinding
         get () = _vb!!
 
+    private val timeoutCountLimit: Int by lazy {
+        arguments?.getInt(ARG_TIMEOUT_COUNT) ?: 0
+    }
+
+    private val timeoutMills: Long by lazy {
+        arguments?.getLong(ARG_TIMEOUT_MILLS) ?: 15000
+    }
+
+    private val timeoutMessage: String? by lazy {
+        arguments?.getString(ARG_TIMEOUT_MESSAGE)?.takeIf { it.isNotBlank() }
+    }
+
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
 
     private var imageCapture: ImageCapture? = null
@@ -54,12 +67,25 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         get () = arguments?.getBoolean(ARG_NEED_RECOGNITION) ?: true
 
     private val countDownTimer: CountDownTimer by lazy {
-        object : CountDownTimer(20000, 1000) {
+        object : CountDownTimer(timeoutMills, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
             override fun onFinish() {
-                imageAnalyzer.stopAnalyzing()
-                onFailTextRecognized(Exception())
+                handleOnTimeOut()
             }
+        }
+    }
+
+    private var timeoutCount = 0
+
+    private fun handleOnTimeOut() {
+        timeoutCount++
+        if (timeoutCount >= timeoutCountLimit) {
+            imageAnalyzer.stopAnalyzing()
+            timeoutCount = 0
+            onFailTextRecognized(Exception())
+        } else {
+            timeoutMessage?.let { Toast.makeText(context, it, Toast.LENGTH_SHORT).show() }
+            countDownTimer.start()
         }
     }
 
@@ -266,6 +292,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     companion object {
 
         const val ARG_NEED_RECOGNITION = "arg_need_recognition"
+        const val ARG_TIMEOUT_MILLS = "ARG_TIMEOUT_MILLS"
+        const val ARG_TIMEOUT_COUNT = "ARG_TIMEOUT_COUNT"
+        const val ARG_TIMEOUT_MESSAGE = "ARG_TIMEOUT_MESSAGE"
 
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"

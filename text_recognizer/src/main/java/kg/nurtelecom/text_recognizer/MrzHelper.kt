@@ -1,6 +1,6 @@
 package kg.nurtelecom.text_recognizer
 
-import java.lang.StringBuilder
+import kotlin.text.StringBuilder
 
 object MrzHelper {
 
@@ -21,6 +21,7 @@ object MrzHelper {
 
     private fun prepareMrz(rawMrz: String): String {
         return rawMrz
+            .replace("«", "<")
             .replace("((?![A-Za-z0-9<]).)".toRegex(), "")
             .replace("\n", "")
             .replace("1D", "ID")
@@ -32,13 +33,12 @@ object MrzHelper {
         return when (mrz.length) {
             72 -> validateTd2(mrz)
             88 -> validateTd3(mrz)
-            90 -> validateTd1(mrz)
-            else -> null
+            else -> validateTd1(mrz)
         }
     }
 
     private fun validateTd1(mrz: String): RecognizedMrz? {
-        if (mrz.length < 90) return null
+        if (mrz.length < 60) return null
         val lastControlNumber = mrz[59]
 
         // Check first line -> 14(check number index): 5-14 (number sequence, index from - index to + 1)
@@ -60,8 +60,11 @@ object MrzHelper {
         val mainControlNumber = Character.getNumericValue(lastControlNumber)
         if (checkControlSum(mainSequence.toString(), mainControlNumber).not()) return null
 
+        val extendedMRZ = StringBuilder(mrz)
+        val times = 90 - mrz.length
+        if (times > 0) repeat(times) { extendedMRZ.append('<') }
         return RecognizedMrz(
-            mrz,
+            extendedMRZ.take(90).toString(),
             mrz.substring(1, 2),
             mrz.substring(2, 5),
             mrz.substring(5, 14),
@@ -183,9 +186,4 @@ object MrzHelper {
     private fun getNumberWeight(position: Int): Int {
         return numbersWeights[position]
     }
-}
-
-fun main() {
-//    println(MrzHelper.isMrzValid("TyraxxepeMecTopawaevnPaceofbiIDKGZID0452854521410200100401<0110141M2712181KGZ<<<<<<<<<<<6A"))
-    println(MrzHelper.isMrzValid("IDKGZID1601490421401199301593<9301146M3002197KGZ<<<<<<<<<<<4SHERALY<UULU<<CHYNGYZ<<<<<<<<<"))
 }

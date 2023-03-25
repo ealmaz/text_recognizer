@@ -38,7 +38,7 @@ class  MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         setContentView(viewBinding.root)
         viewBinding.btn.setOnClickListener {
-            textRecognizerContract.launch(null)
+            textRecognizerContract.launch(TextRecognizerConfig(true, 5, 3000,"Убедитесь, что паспорт полностью в кадре"))
         }
     }
 

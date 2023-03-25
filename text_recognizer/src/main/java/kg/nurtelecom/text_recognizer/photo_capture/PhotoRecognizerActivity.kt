@@ -30,7 +30,12 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
 
     override fun openCameraFragment(needRecognition: Boolean) {
         val cameraFragment = PhotoCaptureFragment().apply {
-            arguments = bundleOf(PhotoCaptureFragment.ARG_NEED_RECOGNITION to needRecognition)
+            arguments = bundleOf(
+                PhotoCaptureFragment.ARG_NEED_RECOGNITION to needRecognition,
+                PhotoCaptureFragment.ARG_TIMEOUT_COUNT to textRecognizerConfig?.timeoutLimit,
+                PhotoCaptureFragment.ARG_TIMEOUT_MILLS to textRecognizerConfig?.timeoutMills,
+                PhotoCaptureFragment.ARG_TIMEOUT_MESSAGE to textRecognizerConfig?.timeoutMessage,
+            )
         }
         startFragment(cameraFragment)
     }
@@ -111,5 +116,8 @@ class RecognizePhotoContract : ActivityResultContract<TextRecognizerConfig?, Int
 }
 
 data class TextRecognizerConfig(
-    val shouldRecognizeOnRetry: Boolean
+    val shouldRecognizeOnRetry: Boolean,
+    val timeoutLimit: Int? = null,
+    val timeoutMills: Long? = null,
+    val timeoutMessage: String? = null,
 ): java.io.Serializable
