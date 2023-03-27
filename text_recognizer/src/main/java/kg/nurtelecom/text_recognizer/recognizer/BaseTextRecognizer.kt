@@ -10,7 +10,7 @@ abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizer
 
     protected var recognizer: TextRecognizer? = null
 
-    protected val rotationTryCount = 4
+    protected val rotationTryCount = 1
     protected val rotationDegree = 90
 
     protected var currentRotationTry = 0

@@ -2,7 +2,6 @@ package kg.nurtelecom.text_recognizer.photo_capture
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -23,8 +22,8 @@ import androidx.fragment.app.FragmentActivity
 import com.google.common.util.concurrent.ListenableFuture
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
-import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
+import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoCaptureBinding
 import kg.nurtelecom.text_recognizer.overlay.BlackRectangleOverlay
 import java.io.File
@@ -208,12 +207,12 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             setOnClickListener { takePhoto() }
             when (needToRecognizeText) {
                 true -> {
-                    visibility = View.GONE
+                    visibility = View.INVISIBLE
                     vb.tvDescription.visibility = View.VISIBLE
                 }
                 else -> {
                     visibility = View.VISIBLE
-                    vb.tvDescription.visibility = View.GONE
+                    vb.tvDescription.visibility = View.INVISIBLE
                 }
             }
         }

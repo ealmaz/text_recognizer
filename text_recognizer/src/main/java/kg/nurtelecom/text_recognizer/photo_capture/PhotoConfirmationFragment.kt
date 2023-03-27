@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.design.chili.extensions.loadImageFormFilePath
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoConfirmationBinding
 
 class PhotoConfirmationFragment : Fragment() {
@@ -33,8 +34,8 @@ class PhotoConfirmationFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        photoUri?.let {
-            vb.ivPhoto.setImageURI(it)
+        photoUri?.path?.let {
+            vb.ivPhoto.loadImageFormFilePath(it)
         }
         vb.btnSecondary.setOnClickListener {
             (requireActivity() as PhotoRecognizerActivityCallback).openCameraFragment(shouldRecognizeOnRetry)
