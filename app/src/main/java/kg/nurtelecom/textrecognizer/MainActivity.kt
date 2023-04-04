@@ -2,6 +2,7 @@ package kg.nurtelecom.textrecognizer
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -38,7 +39,9 @@ class  MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         setContentView(viewBinding.root)
         viewBinding.btn.setOnClickListener {
-            textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре"))
+            textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", { ex ->
+                Log.d("SPECIAL", "Error: $ex")
+            }))
         }
     }
 

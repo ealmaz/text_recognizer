@@ -5,6 +5,8 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import kg.nurtelecom.text_recognizer.RecognizedMrz
+import java.util.*
+import kotlin.concurrent.schedule
 
 abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizerCallback) {
 
@@ -41,7 +43,9 @@ abstract class BaseTextRecognizer(private val recognizerCallback: TextRecognizer
 
     protected fun onRecognitionFail(ex: Exception) {
         recognizerCallback.onRecognitionFail(ex)
-        onDestroy()
+        Timer().schedule(5000) {
+            proceedImage()
+        }
     }
 
     protected fun requestNewImage() {

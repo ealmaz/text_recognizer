@@ -13,7 +13,7 @@ import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity.Companion.TEXT_RECOGNIZER_CONFIGS
 
-class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback {
+class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback, RecognitionFailureListener {
 
     private val resultDataIntent: Intent = Intent()
 
@@ -79,6 +79,10 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
             .commit()
     }
 
+    override fun onRecognitionFail(ex: Exception?) {
+        textRecognizerConfig?.onRecognitionFail?.invoke(ex)
+    }
+
     companion object {
 
         const val TEXT_RECOGNIZER_CONFIGS = "text_recognizer_configs"
@@ -115,9 +119,14 @@ class RecognizePhotoContract : ActivityResultContract<TextRecognizerConfig?, Int
     }
 }
 
+interface RecognitionFailureListener {
+    fun onRecognitionFail(ex: Exception? = null)
+}
+
 data class TextRecognizerConfig(
     val shouldRecognizeOnRetry: Boolean,
     val timeoutLimit: Int? = null,
     val timeoutMills: Long? = null,
     val timeoutMessage: String? = null,
+    val onRecognitionFail: ((ex: Exception?)->Unit)? = null,
 ): java.io.Serializable

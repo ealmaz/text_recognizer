@@ -265,7 +265,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     override fun onFailTextRecognized(ex: Exception) {
-        takePhoto()
+        (activity as? RecognitionFailureListener)?.onRecognitionFail(ex)
     }
 
     override fun onDestroyView() {
