@@ -80,7 +80,11 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
     }
 
     override fun onRecognitionFail(ex: Exception?) {
-        textRecognizerConfig?.onRecognitionFail?.invoke(ex)
+        resultDataIntent.putExtra(EXTRA_MRZ_RECOGNITION_FAILURE, ex)
+    }
+
+    override fun onBackPressed() {
+        closeActivity()
     }
 
     companion object {
@@ -93,6 +97,7 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
 
         const val EXTRA_PHOTO_URI = "result_photo"
         const val EXTRA_MRZ_STRING = "result_mrz"
+        const val EXTRA_MRZ_RECOGNITION_FAILURE = "is_mrz_recognition_failure"
     }
 }
 
@@ -128,5 +133,4 @@ data class TextRecognizerConfig(
     val timeoutLimit: Int? = null,
     val timeoutMills: Long? = null,
     val timeoutMessage: String? = null,
-    val onRecognitionFail: ((ex: Exception?)->Unit)? = null,
 ): java.io.Serializable
