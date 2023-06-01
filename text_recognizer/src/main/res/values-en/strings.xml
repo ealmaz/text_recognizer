@@ -5,4 +5,7 @@
     <string name="yes_they_visible">Yes, its visible</string>
     <string name="no_reshoot">No, retake</string>
     <string name="capture_confirmation_text">Is the data clearly visible?</string>
+    <string name="title_photo_capture">Passport back photo</string>
+    <string name="desc_photo_capture">Put your passport within the frame,\nit will be scanned\nautomatically</string>
+
 </resources>
