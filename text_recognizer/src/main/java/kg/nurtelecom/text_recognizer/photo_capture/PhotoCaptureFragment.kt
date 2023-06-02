@@ -208,11 +208,11 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             when (needToRecognizeText) {
                 true -> {
                     visibility = View.INVISIBLE
-                    vb.tvDescription.visibility = View.VISIBLE
+//                    vb.tvDescription.visibility = View.VISIBLE
                 }
                 else -> {
                     visibility = View.VISIBLE
-                    vb.tvDescription.visibility = View.INVISIBLE
+//                    vb.tvDescription.visibility = View.INVISIBLE
                 }
             }
         }
