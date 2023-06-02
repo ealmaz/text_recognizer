@@ -5,7 +5,7 @@
     <string name="yes_they_visible">Да, видны</string>
     <string name="no_reshoot">Нет, переснять</string>
     <string name="capture_confirmation_text">Данные отчетливо видны?</string>
-    <string name="title_photo_capture">Фото с оборотной стороны\nпаспорта</string>
-    <string name="desc_photo_capture">Поместите паспорт в рамку,\nсканирование произойдет\nавтоматически</string>
+    <string name="text_recognizer_title_photo_capture">Фото с оборотной стороны\nпаспорта</string>
+    <string name="text_recognizer_desc_photo_capture">Поместите паспорт в рамку,\nсканирование произойдет\nавтоматически</string>
 
 </resources>
