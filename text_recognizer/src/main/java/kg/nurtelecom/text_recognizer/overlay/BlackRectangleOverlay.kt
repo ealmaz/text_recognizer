@@ -18,7 +18,7 @@ class BlackRectangleOverlay @JvmOverloads constructor(
 ) : Overlay(context, attrs, defStyleAttr) {
 
     override fun drawShapes(canvas: Canvas) {
-        drawColor(com.design.chili.R.color.black_1)
+        drawColor(com.design2.chili2.R.color.black_1)
         drawRectangle(canvas)
     }
 
@@ -75,7 +75,7 @@ class BlackRectangleOverlay @JvmOverloads constructor(
 
     private fun drawText(canvas: Canvas, rect: RectF) {
         val text = context.getString(R.string.text_recognizer_desc_photo_capture)
-        val textColor = ContextCompat.getColor(context, com.design.chili.R.color.white_1)
+        val textColor = ContextCompat.getColor(context, com.design2.chili2.R.color.white_1)
         val textSizePx = 16.dp
 
         val marginTopPx = 24.dp

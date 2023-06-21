@@ -46,7 +46,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/padding_24dp"
-        android:background="@drawable/chili_card_rounded_background"
+        android:background="@drawable/chili_cell_rounded_background"
         android:text="@string/recognition_description"
         android:gravity="center"
         android:padding="@dimen/padding_8dp"
