@@ -28,7 +28,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <com.design2.chili2.view.camera_overlays.PassportCardOverlay
+        <com.design.chili.view.camera_overlays.PassportCardOverlay
             android:id="@+id/overlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

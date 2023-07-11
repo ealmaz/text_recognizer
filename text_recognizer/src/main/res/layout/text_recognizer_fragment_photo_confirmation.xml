@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
-    <com.design2.chili2.view.camera_overlays.PassportCardOverlay
+    <com.design.chili.view.camera_overlays.PassportCardOverlay
         android:id="@+id/overlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/no_reshoot"
-            style="@style/Chili.ButtonStyle.Additional"
+            style="@style/Chili.ButtonStyle.NewAdditional"
             android:layout_marginHorizontal="@dimen/padding_16dp"/>
 
         <Button

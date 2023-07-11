@@ -31,9 +31,9 @@ open abstract class Overlay@JvmOverloads constructor(context: Context,
         auxCanvas.drawPaint(paint)
 
         paint.run {
-            color = ContextCompat.getColor(context, com.design2.chili2.R.color.magenta_1  )
+            color = ContextCompat.getColor(context, com.design.chili.R.color.magenta_1  )
             style = Paint.Style.STROKE
-            strokeWidth = resources.getDimension(com.design2.chili2.R.dimen.view_4dp)
+            strokeWidth = resources.getDimension(com.design.chili.R.dimen.view_4dp)
         }
 
         drawShapes(auxCanvas)

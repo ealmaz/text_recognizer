@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.design2.chili2.extensions.loadImageFormFilePath
+import com.design.chili.extensions.loadImageFormFilePath
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoConfirmationBinding
 
 class PhotoConfirmationFragment : Fragment() {
