@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="recognition_description">Маалыматтар алкактын чегинде көрүнүп турганына ынаныңыз. Маалыматтардын окулушун күтүңүз.</string>
-    <string name="yes_they_visible">Ооба, көрүндү</string>
-    <string name="no_reshoot">Жок, кайра тартуу керек</string>
+    <string name="recognition_description">Поместите паспорт в рамку \n и нажмите на кнопку «сфотографировать»</string>
+    <string name="yes_they_visible">Отправить фото</string>
+    <string name="no_reshoot">Снять еще раз</string>
+    <string name="check_passport">Проверьте паспорт</string>
     <string name="capture_confirmation_text">Маалыматтар так көрүнүп жатабы?</string>
     <string name="text_recognizer_title_photo_capture">Паспорттун арткы бетинин\nсүрөтү</string>
-    <string name="text_recognizer_desc_photo_capture">Паспортту алкактын ичине келтириңиз,\nсканерлөө автоматтык түрдө\nжүргүзүлөт</string>
 
 </resources>

@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity.Companion.TEXT_RECOGNIZER_CONFIGS
+import java.io.Serializable
 
 class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback, RecognitionFailureListener {
 
@@ -35,6 +36,9 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
                 PhotoCaptureFragment.ARG_TIMEOUT_COUNT to textRecognizerConfig?.timeoutLimit,
                 PhotoCaptureFragment.ARG_TIMEOUT_MILLS to textRecognizerConfig?.timeoutMills,
                 PhotoCaptureFragment.ARG_TIMEOUT_MESSAGE to textRecognizerConfig?.timeoutMessage,
+                PhotoCaptureFragment.ARG_AUTO_PHOTO_CAPTURE to textRecognizerConfig?.autoPhotoCapture,
+                PhotoCaptureFragment.ARG_PHOTO_CAPTURE_LABELS to textRecognizerConfig?.photoCaptureLabels,
+                PhotoCaptureFragment.ARG_RECOGNITION_LABELS to textRecognizerConfig?.recognitionLabels
             )
         }
         startFragment(cameraFragment)
@@ -44,7 +48,8 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
         val confirmationFragment = PhotoConfirmationFragment()
         confirmationFragment.arguments = bundleOf(
             PhotoConfirmationFragment.ARG_FILE_URI to uri,
-            PhotoConfirmationFragment.ARG_SHOULD_RECOGNIZE_ON_RETRY to (textRecognizerConfig?.shouldRecognizeOnRetry ?: false)
+            PhotoConfirmationFragment.ARG_SHOULD_RECOGNIZE_ON_RETRY to (textRecognizerConfig?.shouldRecognizeOnRetry ?: false),
+            PhotoConfirmationFragment.ARG_CONFIRMATION_LABELS to textRecognizerConfig?.confirmationLabels
         )
         startFragment(confirmationFragment)
     }
@@ -133,4 +138,15 @@ data class TextRecognizerConfig(
     val timeoutLimit: Int? = null,
     val timeoutMills: Long? = null,
     val timeoutMessage: String? = null,
-): java.io.Serializable
+    val autoPhotoCapture: Boolean = true,
+    val recognitionLabels: ScreenLabels? = null,
+    val photoCaptureLabels: ScreenLabels? = null,
+    val confirmationLabels: ScreenLabels? = null,
+): Serializable
+
+
+data class ScreenLabels(
+    val headerText: String? = null,
+    val title: String? = null,
+    val description: String? = null
+): Serializable

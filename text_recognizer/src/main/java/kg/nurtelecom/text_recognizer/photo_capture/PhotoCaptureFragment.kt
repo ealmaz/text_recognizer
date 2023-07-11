@@ -11,10 +11,17 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.camera.core.*
+import androidx.camera.core.AspectRatio
+import androidx.camera.core.CameraControl
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.FocusMeteringAction
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
+import androidx.camera.core.Preview
+import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -25,10 +32,9 @@ import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoCaptureBinding
-import kg.nurtelecom.text_recognizer.overlay.BlackRectangleOverlay
 import java.io.File
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -48,6 +54,18 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private val timeoutMessage: String? by lazy {
         arguments?.getString(ARG_TIMEOUT_MESSAGE)?.takeIf { it.isNotBlank() }
+    }
+
+    private val autoPhotoCapture: Boolean by lazy {
+        arguments?.getBoolean(ARG_AUTO_PHOTO_CAPTURE, true) ?: true
+    }
+
+    private val recognitionLabels: ScreenLabels? by lazy {
+        arguments?.getSerializable(ARG_RECOGNITION_LABELS) as? ScreenLabels
+    }
+
+    private val photoCaptureLabels: ScreenLabels? by lazy {
+        arguments?.getSerializable(ARG_PHOTO_CAPTURE_LABELS) as? ScreenLabels
     }
 
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
@@ -135,13 +153,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             .build()
             .also { it.setSurfaceProvider(vb.surfacePreview.surfaceProvider) }
 
-        vb.flPreview.addView(
-            BlackRectangleOverlay(requireContext()),
-            FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        )
+        setupOverlayLabels(recognitionLabels)
 
         imageCapture = ImageCapture.Builder()
             .setTargetRotation(rotation)
@@ -205,15 +217,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         }
         vb.btnCapture.apply {
             setOnClickListener { takePhoto() }
-            when (needToRecognizeText) {
-                true -> {
-                    visibility = View.INVISIBLE
-//                    vb.tvDescription.visibility = View.VISIBLE
-                }
-                else -> {
-                    visibility = View.VISIBLE
-//                    vb.tvDescription.visibility = View.INVISIBLE
-                }
+            visibility = when (needToRecognizeText) {
+                true -> View.INVISIBLE
+                else -> View.VISIBLE
             }
         }
     }
@@ -247,6 +253,15 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     }
 
+    private fun setButtonVisibilityOrTakePicture() {
+        if (autoPhotoCapture) {
+            takePhoto()
+        } else {
+            vb.btnCapture.visibility = View.VISIBLE
+            setupOverlayLabels(photoCaptureLabels)
+        }
+    }
+
     private fun tryGetActivity(): FragmentActivity {
         while (true) {
             activity?.let {
@@ -261,7 +276,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     override fun onSuccessTextRecognized(result: RecognizedMrz) {
         (tryGetActivity() as PhotoRecognizerActivityCallback).onMrzRecognized(result)
-        takePhoto()
+        setButtonVisibilityOrTakePicture()
     }
 
     override fun onFailTextRecognized(ex: Exception) {
@@ -288,12 +303,23 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         return File.createTempFile(prefix, suffix, directory)
     }
 
+    private fun setupOverlayLabels(screenLabels: ScreenLabels?) {
+        vb.overlay.apply {
+            screenLabels?.description?.let { setDescription(it) }
+            screenLabels?.title?.let { setTitle(it) }
+            screenLabels?.headerText?.let { setHeaderText(it) }
+        }
+    }
+
     companion object {
 
         const val ARG_NEED_RECOGNITION = "arg_need_recognition"
         const val ARG_TIMEOUT_MILLS = "ARG_TIMEOUT_MILLS"
         const val ARG_TIMEOUT_COUNT = "ARG_TIMEOUT_COUNT"
         const val ARG_TIMEOUT_MESSAGE = "ARG_TIMEOUT_MESSAGE"
+        const val ARG_AUTO_PHOTO_CAPTURE = "ARG_AUTO_PHOTO_CAPTURE"
+        const val ARG_RECOGNITION_LABELS = "ARG_RECOGNITION_LABELS"
+        const val ARG_PHOTO_CAPTURE_LABELS = "ARG_PHOTO_CAPTURE_LABELS"
 
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"

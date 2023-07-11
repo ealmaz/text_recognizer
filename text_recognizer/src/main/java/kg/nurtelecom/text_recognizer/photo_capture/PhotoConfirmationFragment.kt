@@ -19,6 +19,10 @@ class PhotoConfirmationFragment : Fragment() {
         arguments?.getBoolean(ARG_SHOULD_RECOGNIZE_ON_RETRY) ?: false
     }
 
+    private val confirmationLabel: ScreenLabels? by lazy {
+        arguments?.getSerializable(ARG_CONFIRMATION_LABELS) as? ScreenLabels
+    }
+
     private var _vb: TextRecognizerFragmentPhotoConfirmationBinding? = null
     private val vb: TextRecognizerFragmentPhotoConfirmationBinding
         get() = _vb!!
@@ -44,6 +48,7 @@ class PhotoConfirmationFragment : Fragment() {
             photoUri?.let {(requireActivity() as PhotoRecognizerActivityCallback).onPhotoConfirmed(it)}
             (requireActivity() as PhotoRecognizerActivityCallback).closeActivityWithData()
         }
+        setupOverlayLabels(confirmationLabel)
     }
 
     override fun onDestroyView() {
@@ -51,8 +56,17 @@ class PhotoConfirmationFragment : Fragment() {
         _vb = null
     }
 
+    private fun setupOverlayLabels(screenLabels: ScreenLabels?) {
+        vb.overlay.apply {
+            screenLabels?.description?.let { setDescription(it) }
+            screenLabels?.title?.let { setTitle(it) }
+            screenLabels?.headerText?.let { setHeaderText(it) }
+        }
+    }
+
     companion object {
         const val ARG_FILE_URI = "file_uri"
         const val ARG_SHOULD_RECOGNIZE_ON_RETRY = "should_recognize_on_retry"
+        const val ARG_CONFIRMATION_LABELS = "ARG_CONFIRMATION_LABELS"
     }
 }
