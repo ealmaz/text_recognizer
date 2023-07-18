@@ -2,7 +2,7 @@ package kg.nurtelecom.textrecognizer
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -41,11 +41,13 @@ class  MainActivity : AppCompatActivity() {
         setContentView(viewBinding.root)
         viewBinding.btn.setOnClickListener {
             PhotoRecognizerActivity.fileUploaderCallBack = object : FileUploader {
-                override fun upload(
+                override fun uploadRecognizedPhoto(
                     file: File,
+                    recognizedMrz: RecognizedMrz?,
                     onSuccess: () -> Unit,
                     onFail: (warningMessage: String, finishOnFail: Boolean) -> Unit
                 ) {
+                    Toast.makeText(this@MainActivity, recognizedMrz.toString(), Toast.LENGTH_SHORT).show()
                     onSuccess()
                 }
 

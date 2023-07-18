@@ -18,6 +18,7 @@ import java.io.Serializable
 class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback, RecognitionFailureListener {
 
     private val resultDataIntent: Intent = Intent()
+    private var recognizedData: RecognizedMrz? = null
 
     private val textRecognizerConfig: TextRecognizerConfig? by lazy {
         intent.getSerializableExtra(TEXT_RECOGNIZER_CONFIGS) as? TextRecognizerConfig
@@ -61,6 +62,7 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
     }
 
     override fun onMrzRecognized(result: RecognizedMrz) {
+        recognizedData = result
         resultDataIntent.putExtra(EXTRA_MRZ_STRING, result)
     }
 
@@ -71,8 +73,9 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
 
     override fun uploadFile(file: File) {
         if (fileUploaderCallBack == null) closeActivityWithData()
-        fileUploaderCallBack?.upload(
+        fileUploaderCallBack?.uploadRecognizedPhoto(
             file,
+            recognizedData,
             { closeActivityWithData() },
             { _, _ -> closeActivity() }
         )
@@ -170,5 +173,5 @@ data class ScreenLabels(
 ): Serializable
 
 interface FileUploader{
-    fun upload(file: File,onSuccess: () -> Unit, onFail: (warningMessage: String, finishOnFail: Boolean) -> Unit)
+    fun uploadRecognizedPhoto(file: File, recognizedMrz: RecognizedMrz?, onSuccess: () -> Unit, onFail: (warningMessage: String, finishOnFail: Boolean) -> Unit)
 }
