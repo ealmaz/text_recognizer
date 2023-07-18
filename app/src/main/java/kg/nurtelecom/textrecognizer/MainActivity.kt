@@ -7,10 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import kg.nurtelecom.text_recognizer.RecognizedMrz
+import kg.nurtelecom.text_recognizer.photo_capture.FileUploader
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity
 import kg.nurtelecom.text_recognizer.photo_capture.RecognizePhotoContract
 import kg.nurtelecom.text_recognizer.photo_capture.TextRecognizerConfig
 import kg.nurtelecom.textrecognizer.databinding.ActivityMainBinding
+import java.io.File
 
 class  MainActivity : AppCompatActivity() {
 
@@ -19,7 +21,6 @@ class  MainActivity : AppCompatActivity() {
            viewBinding.ivImage.setImageURI(it)
         }
         it?.getSerializableExtra(PhotoRecognizerActivity.EXTRA_MRZ_STRING)?.let {
-
             viewBinding.tvMrz.setText((it as RecognizedMrz).toString())
         } ?: let {
             viewBinding.tvMrz.text = "Unable to recognize MRZ"
@@ -39,6 +40,16 @@ class  MainActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(MODE_NIGHT_FOLLOW_SYSTEM)
         setContentView(viewBinding.root)
         viewBinding.btn.setOnClickListener {
+            PhotoRecognizerActivity.fileUploaderCallBack = object : FileUploader {
+                override fun upload(
+                    file: File,
+                    onSuccess: () -> Unit,
+                    onFail: (warningMessage: String, finishOnFail: Boolean) -> Unit
+                ) {
+
+                }
+
+            }
             textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", false))
         }
     }

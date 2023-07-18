@@ -45,8 +45,9 @@ class PhotoConfirmationFragment : Fragment() {
             (requireActivity() as PhotoRecognizerActivityCallback).openCameraFragment(shouldRecognizeOnRetry)
         }
         vb.btnPrimary.setOnClickListener {
+            vb.btnPrimary.setIsLoading(true)
+            vb.btnSecondary.isEnabled = false
             photoUri?.let {(requireActivity() as PhotoRecognizerActivityCallback).onPhotoConfirmed(it)}
-            (requireActivity() as PhotoRecognizerActivityCallback).closeActivityWithData()
         }
         setupOverlayLabels(confirmationLabel)
     }
@@ -57,10 +58,8 @@ class PhotoConfirmationFragment : Fragment() {
     }
 
     private fun setupOverlayLabels(screenLabels: ScreenLabels?) {
-        vb.overlay.apply {
-            screenLabels?.description?.let { setDescription(it) }
-            screenLabels?.title?.let { setTitle(it) }
-            screenLabels?.headerText?.let { setHeaderText(it) }
+        vb.apply {
+            screenLabels?.description?.let { tvHint.text = it }
         }
     }
 

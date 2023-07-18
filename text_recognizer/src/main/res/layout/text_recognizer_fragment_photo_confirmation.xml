@@ -12,43 +12,41 @@
         android:src="@color/gray_1_alpha_50"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
-
-    <com.design2.chili2.view.camera_overlays.PassportCardOverlay
-        android:id="@+id/overlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:overlayAlpha="77"
-        app:headerText="\n"
-        app:title="@string/check_passport"
-        app:description="@string/capture_confirmation_text"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@id/ll_controls"/>
 
     <LinearLayout
         android:id="@+id/ll_controls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="@color/white_1_black_3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/tv_hint"
+            android:text="@string/capture_confirmation_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="@style/Chili.H7.Primary"
+            android:layout_marginHorizontal="@dimen/padding_16dp"
+            android:layout_marginTop="@dimen/padding_24dp"
+            android:layout_marginBottom="@dimen/padding_16dp"/>
 
         <Button
             android:id="@+id/btn_secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/no_reshoot"
-            style="@style/Chili.ButtonStyle.Additional"
+            style="@style/Chili.ButtonStyle.Secondary"
             android:layout_marginHorizontal="@dimen/padding_16dp"/>
 
-        <Button
+        <com.design2.chili2.view.buttons.LoaderButton
             android:id="@+id/btn_primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/yes_they_visible"
-            style="@style/Chili.ButtonStyle.Primary"
             android:layout_margin="@dimen/padding_16dp"/>
 
     </LinearLayout>
