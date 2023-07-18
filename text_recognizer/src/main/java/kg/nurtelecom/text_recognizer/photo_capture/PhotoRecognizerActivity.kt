@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity.Companion.TEXT_RECOGNIZER_CONFIGS
+import java.io.File
 import java.io.Serializable
 
 class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback, RecognitionFailureListener {
@@ -56,7 +57,7 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
 
     override fun onPhotoConfirmed(uri: Uri) {
         resultDataIntent.putExtra(EXTRA_PHOTO_URI, uri)
-        closeActivityWithData()
+        uploadFile(File(uri.path ?: ""))
     }
 
     override fun onMrzRecognized(result: RecognizedMrz) {
@@ -66,6 +67,15 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
     override fun closeActivity() {
         setResult(RESULT_CANCELED)
         finish()
+    }
+
+    override fun uploadFile(file: File) {
+        if (fileUploaderCallBack == null) closeActivityWithData()
+        fileUploaderCallBack?.upload(
+            file,
+            { closeActivityWithData() },
+            { _, _ -> closeActivity() }
+        )
     }
 
     override fun closeActivityWithData() {
@@ -92,6 +102,11 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
         closeActivity()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        fileUploaderCallBack = null
+    }
+
     companion object {
 
         const val TEXT_RECOGNIZER_CONFIGS = "text_recognizer_configs"
@@ -103,6 +118,8 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
         const val EXTRA_PHOTO_URI = "result_photo"
         const val EXTRA_MRZ_STRING = "result_mrz"
         const val EXTRA_MRZ_RECOGNITION_FAILURE = "is_mrz_recognition_failure"
+
+        var fileUploaderCallBack: FileUploader? = null
     }
 }
 
@@ -112,6 +129,7 @@ interface PhotoRecognizerActivityCallback {
     fun onPhotoConfirmed(uri: Uri)
     fun onMrzRecognized(result: RecognizedMrz)
     fun closeActivity()
+    fun uploadFile(file: File)
     fun closeActivityWithData()
     fun onPermissionsDenied()
 }
@@ -150,3 +168,7 @@ data class ScreenLabels(
     val title: String? = null,
     val description: String? = null
 ): Serializable
+
+interface FileUploader{
+    fun upload(file: File,onSuccess: () -> Unit, onFail: (warningMessage: String, finishOnFail: Boolean) -> Unit)
+}
