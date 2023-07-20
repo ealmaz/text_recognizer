@@ -39,7 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/no_reshoot"
-            style="@style/Chili.ButtonStyle.Secondary"
+            style="@style/Chili.ButtonStyle.Additional"
             android:layout_marginHorizontal="@dimen/padding_16dp"/>
 
         <com.design2.chili2.view.buttons.LoaderButton
