@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.photo_capture.FileUploader
+import kg.nurtelecom.text_recognizer.photo_capture.OverlayType
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity
 import kg.nurtelecom.text_recognizer.photo_capture.RecognizePhotoContract
 import kg.nurtelecom.text_recognizer.photo_capture.TextRecognizerConfig
@@ -52,7 +53,7 @@ class  MainActivity : AppCompatActivity() {
                 }
 
             }
-            textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", false))
+            textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", true, overlayType = OverlayType.RECTANGLE_OVERLAY))
         }
     }
 

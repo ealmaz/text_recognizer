@@ -40,7 +40,8 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
                 PhotoCaptureFragment.ARG_TIMEOUT_MESSAGE to textRecognizerConfig?.timeoutMessage,
                 PhotoCaptureFragment.ARG_AUTO_PHOTO_CAPTURE to textRecognizerConfig?.autoPhotoCapture,
                 PhotoCaptureFragment.ARG_PHOTO_CAPTURE_LABELS to textRecognizerConfig?.photoCaptureLabels,
-                PhotoCaptureFragment.ARG_RECOGNITION_LABELS to textRecognizerConfig?.recognitionLabels
+                PhotoCaptureFragment.ARG_RECOGNITION_LABELS to textRecognizerConfig?.recognitionLabels,
+                PhotoCaptureFragment.ARG_OVERLAY_TYPE to textRecognizerConfig?.overlayType,
             )
         }
         startFragment(cameraFragment)
@@ -163,7 +164,13 @@ data class TextRecognizerConfig(
     val recognitionLabels: ScreenLabels? = null,
     val photoCaptureLabels: ScreenLabels? = null,
     val confirmationLabels: ScreenLabels? = null,
+    val overlayType: OverlayType? = OverlayType.PASSPORT_OVERLAY,
 ): Serializable
+
+enum class OverlayType {
+    RECTANGLE_OVERLAY,
+    PASSPORT_OVERLAY,
+}
 
 
 data class ScreenLabels(

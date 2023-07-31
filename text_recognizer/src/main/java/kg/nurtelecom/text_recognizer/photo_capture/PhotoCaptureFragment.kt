@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.AspectRatio
@@ -24,14 +25,19 @@ import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.design.chili.view.camera_overlays.PassportCardOverlay
 import com.google.common.util.concurrent.ListenableFuture
+import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoCaptureBinding
+import kg.nurtelecom.text_recognizer.overlay.BlackRectangleOverlay
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -66,6 +72,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private val photoCaptureLabels: ScreenLabels? by lazy {
         arguments?.getSerializable(ARG_PHOTO_CAPTURE_LABELS) as? ScreenLabels
+    }
+
+    private val overlayType: OverlayType? by lazy {
+        arguments?.getSerializable(ARG_OVERLAY_TYPE) as? OverlayType
     }
 
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
@@ -217,11 +227,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         }
         vb.btnCapture.apply {
             setOnClickListener { takePhoto() }
-            visibility = when (needToRecognizeText) {
-                true -> View.INVISIBLE
-                else -> View.VISIBLE
-            }
+            isInvisible = needToRecognizeText
         }
+        vb.tvDescription.isVisible = needToRecognizeText && overlayType == OverlayType.RECTANGLE_OVERLAY
+        vb.ivMask.isVisible = overlayType == OverlayType.RECTANGLE_OVERLAY
     }
 
     private fun takePhoto() {
@@ -304,10 +313,23 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private fun setupOverlayLabels(screenLabels: ScreenLabels?) {
-        vb.overlay.apply {
-            screenLabels?.description?.let { setDescription(it) }
-            screenLabels?.title?.let { setTitle(it) }
-            screenLabels?.headerText?.let { setHeaderText(it) }
+        if (overlayType == OverlayType.PASSPORT_OVERLAY) {
+            PassportCardOverlay(requireContext()).apply {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                setAlpha(102)
+                setHeaderText(R.string.text_recognizer_title_photo_capture)
+                setDescription(R.string.recognition_description)
+                screenLabels?.description?.let { setDescription(it) }
+                screenLabels?.title?.let { setTitle(it) }
+                screenLabels?.headerText?.let { setHeaderText(it) }
+                vb.flPreview.addView(this)
+            }
+        } else {
+            BlackRectangleOverlay(requireContext()).apply {
+                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                vb.tvDescription.setText(R.string.recognition_description_without_button)
+                vb.flPreview.addView(this)
+            }
         }
     }
 
@@ -320,6 +342,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         const val ARG_AUTO_PHOTO_CAPTURE = "ARG_AUTO_PHOTO_CAPTURE"
         const val ARG_RECOGNITION_LABELS = "ARG_RECOGNITION_LABELS"
         const val ARG_PHOTO_CAPTURE_LABELS = "ARG_PHOTO_CAPTURE_LABELS"
+        const val ARG_OVERLAY_TYPE = "arg_overlay_type"
 
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"

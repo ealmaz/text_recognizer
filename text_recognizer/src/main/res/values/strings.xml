@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="recognition_description_without_button">Убедитесь, что данные видны в пределах рамки. Дождитесь когда данные считаются.</string>
     <string name="recognition_description">Поместите паспорт в рамку \n и нажмите на кнопку «сфотографировать»</string>
-    <string name="yes_they_visible">Отправить фото</string>
-    <string name="no_reshoot">Снять еще раз</string>
+    <string name="yes_they_visible">Да, видны</string>
+    <string name="no_reshoot">Нет, переснять</string>
     <string name="check_passport">Проверьте паспорт</string>
     <string name="capture_confirmation_text">Данные отчетливо видны?</string>
     <string name="text_recognizer_title_photo_capture">Фото с оборотной стороны\nпаспорта</string>
