@@ -53,7 +53,7 @@ class  MainActivity : AppCompatActivity() {
                 }
 
             }
-            textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", true, overlayType = OverlayType.RECTANGLE_OVERLAY))
+            textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", true, overlayType = OverlayType.PASSPORT_OVERLAY))
         }
     }
 

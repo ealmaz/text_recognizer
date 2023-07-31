@@ -29,7 +29,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import com.design.chili.view.camera_overlays.PassportCardOverlay
+import com.design2.chili2.view.camera_overlays.PassportCardOverlay
 import com.google.common.util.concurrent.ListenableFuture
 import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
@@ -316,7 +316,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         if (overlayType == OverlayType.PASSPORT_OVERLAY) {
             PassportCardOverlay(requireContext()).apply {
                 layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                setAlpha(102)
+                setOverlayAlpha(102)
                 setHeaderText(R.string.text_recognizer_title_photo_capture)
                 setDescription(R.string.recognition_description)
                 screenLabels?.description?.let { setDescription(it) }

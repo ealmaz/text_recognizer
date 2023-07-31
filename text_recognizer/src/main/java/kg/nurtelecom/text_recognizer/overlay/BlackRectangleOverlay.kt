@@ -12,7 +12,7 @@ class BlackRectangleOverlay @JvmOverloads constructor(
 ) : Overlay(context, attrs, defStyleAttr) {
 
     override fun drawShapes(canvas: Canvas) {
-        drawColor(com.design.chili.R.color.black_1)
+        drawColor(com.design2.chili2.R.color.black_1)
         drawRectangle(canvas)
     }
 
