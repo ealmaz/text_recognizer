@@ -50,6 +50,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     private val vb: TextRecognizerFragmentPhotoCaptureBinding
         get () = _vb!!
 
+    private var previewOverlay: View? = null
+
     private val timeoutCountLimit: Int by lazy {
         arguments?.getInt(ARG_TIMEOUT_COUNT) ?: 0
     }
@@ -313,6 +315,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private fun setupOverlayLabels(screenLabels: ScreenLabels?) {
+        previewOverlay?.let { vb.flPreview.removeView(it) }
         if (overlayType == OverlayType.PASSPORT_OVERLAY) {
             PassportCardOverlay(requireContext()).apply {
                 layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
@@ -322,12 +325,14 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                 screenLabels?.description?.let { setDescription(it) }
                 screenLabels?.title?.let { setTitle(it) }
                 screenLabels?.headerText?.let { setHeaderText(it) }
+                previewOverlay = this
                 vb.flPreview.addView(this)
             }
         } else {
             BlackRectangleOverlay(requireContext()).apply {
                 layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
                 vb.tvDescription.setText(R.string.recognition_description_without_button)
+                previewOverlay = this
                 vb.flPreview.addView(this)
             }
         }
