@@ -11,6 +11,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import kg.nurtelecom.text_recognizer.R
 import kg.nurtelecom.text_recognizer.RecognizedMrz
+import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity.Companion.NEED_RECOGNITION_INTENT_DATA
 import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity.Companion.TEXT_RECOGNIZER_CONFIGS
 import java.io.File
 import java.io.Serializable
@@ -48,6 +49,10 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
     }
 
     override fun openPhotoConfirmationFragment(uri: Uri?) {
+        if (textRecognizerConfig?.hasCustomPhotoConfirmation == true) {
+            uri?.let { onPhotoConfirmed(it) }
+            return
+        }
         val confirmationFragment = PhotoConfirmationFragment()
         confirmationFragment.arguments = bundleOf(
             PhotoConfirmationFragment.ARG_FILE_URI to uri,
@@ -141,7 +146,10 @@ interface PhotoRecognizerActivityCallback {
 class RecognizePhotoContract : ActivityResultContract<TextRecognizerConfig?, Intent?>() {
     override fun createIntent(context: Context, input: TextRecognizerConfig?): Intent {
         return Intent(context, PhotoRecognizerActivity::class.java).apply {
-            input?.let { putExtra(TEXT_RECOGNIZER_CONFIGS, input) }
+            input?.let {
+                putExtra(TEXT_RECOGNIZER_CONFIGS, input)
+                putExtra(NEED_RECOGNITION_INTENT_DATA, input.needRecognition)
+            }
         }
     }
 
@@ -165,6 +173,8 @@ data class TextRecognizerConfig(
     val photoCaptureLabels: ScreenLabels? = null,
     val confirmationLabels: ScreenLabels? = null,
     val overlayType: OverlayType? = OverlayType.PASSPORT_OVERLAY,
+    val hasCustomPhotoConfirmation: Boolean = false,
+    val needRecognition: Boolean = true,
 ): Serializable
 
 enum class OverlayType {
