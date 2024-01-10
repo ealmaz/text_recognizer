@@ -38,7 +38,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
 
-    implementation 'com.github.ealmaz:DesignChili2:0.0.0.123'
+    implementation 'com.github.ealmaz:DesignChili2:0.0.0.187'
 
     def camerax_version = "1.0.2"
 

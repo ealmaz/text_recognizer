@@ -2,6 +2,7 @@ package kg.nurtelecom.text_recognizer.photo_capture
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Rect
 import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -25,6 +26,10 @@ import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.toRect
+import androidx.core.net.toUri
+import androidx.core.view.children
+import androidx.core.view.get
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -38,6 +43,7 @@ import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoCaptureBinding
 import kg.nurtelecom.text_recognizer.overlay.BlackRectangleOverlay
+import kg.nurtelecom.text_recognizer.util.PictureUtils
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -240,7 +246,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
 
-        val tempFile = createTemporaryFiles(name, ".jpg")
+        var tempFile: File = createTemporaryFiles(name, ".jpg")
 
         val outputOptions = ImageCapture.OutputFileOptions
             .Builder(tempFile)
@@ -255,6 +261,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults){
+                    cropImage(tempFile)?.let { tempFile = it }
                     (tryGetActivity() as PhotoRecognizerActivityCallback).openPhotoConfirmationFragment(
                         output.savedUri
                     )
@@ -262,6 +269,15 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             }
         )
 
+    }
+
+    private fun cropImage(file: File): File? {
+        return PictureUtils.compressImage(file.absolutePath, 80, getImageCropRect(), resources.displayMetrics.heightPixels)
+    }
+
+    private fun getImageCropRect(): Rect? {
+        return if (vb.flPreview.childCount <= 0) null
+        else (vb.flPreview.children.find { it is PassportCardOverlay } as? PassportCardOverlay)?.getPassportMaskRectF()?.toRect()
     }
 
     private fun setButtonVisibilityOrTakePicture() {
