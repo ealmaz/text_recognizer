@@ -1,7 +1,5 @@
 package kg.nurtelecom.text_recognizer
 
-import kotlin.text.StringBuilder
-
 object MrzHelper {
 
     private val numbersWeights = listOf(7, 3, 1)
@@ -11,7 +9,7 @@ object MrzHelper {
         rawTextLines.forEach { block ->
             val text = block.replace(" ", "")
             text.split("\n").forEach { line ->
-                if (line.length == 44 || line.length == 36 ||  line.length == 30) {
+                if (line.length == 44 || line.length == 36 || line.length == 30) {
                     mrzBlock.add(line)
                 }
             }
@@ -42,13 +40,25 @@ object MrzHelper {
         val lastControlNumber = mrz[59]
 
         // Check first line -> 14(check number index): 5-14 (number sequence, index from - index to + 1)
-        if (checkControlSum(mrz.subSequence(5, 14), Character.getNumericValue(mrz[14])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(5, 14),
+                Character.getNumericValue(mrz[14])
+            ).not()
+        ) return null
 
         // Check second line -> 36: 30-36
-        if (checkControlSum(mrz.subSequence(30, 36), Character.getNumericValue(mrz[36])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(30, 36),
+                Character.getNumericValue(mrz[36])
+            ).not()
+        ) return null
 
         // Check second line -> 44: 38-44
-        if (checkControlSum(mrz.subSequence(38, 44), Character.getNumericValue(mrz[44])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(38, 44),
+                Character.getNumericValue(mrz[44])
+            ).not()
+        ) return null
 
         // Main control number
         val mainSequence = StringBuilder()
@@ -84,7 +94,7 @@ object MrzHelper {
         var sum = 0
         var lastWeightIndex = 0
         sequence.forEach {
-            val num =  when (isNumber(it)) {
+            val num = when (isNumber(it)) {
                 true -> Character.getNumericValue(it)
                 else -> getLetterAlphabetPosition(it)
             }
@@ -102,11 +112,23 @@ object MrzHelper {
         if (mrz.length < 72) return null
 
 
-        if (checkControlSum(mrz.subSequence(36, 45), Character.getNumericValue(mrz[45])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(36, 45),
+                Character.getNumericValue(mrz[45])
+            ).not()
+        ) return null
 
-        if (checkControlSum(mrz.subSequence(49, 55), Character.getNumericValue(mrz[55])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(49, 55),
+                Character.getNumericValue(mrz[55])
+            ).not()
+        ) return null
 
-        if (checkControlSum(mrz.subSequence(57, 63), Character.getNumericValue(mrz[63])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(57, 63),
+                Character.getNumericValue(mrz[63])
+            ).not()
+        ) return null
 
 
         val lastControlNumber = mrz[71]
@@ -138,15 +160,35 @@ object MrzHelper {
     private fun validateTd3(mrz: String): RecognizedMrz? {
         if (mrz.length < 88) return null
 
-        if (checkControlSum(mrz.subSequence(44, 53), Character.getNumericValue(mrz[53])).not()) return null
+        val expirationDatePlaceholders = "<<<<<<"
 
-        if (checkControlSum(mrz.subSequence(57, 63), Character.getNumericValue(mrz[63])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(44, 53),
+                Character.getNumericValue(mrz[53])
+            ).not()
+        ) return null
 
-        if (checkControlSum(mrz.subSequence(65, 71), Character.getNumericValue(mrz[71])).not()) return null
+        if (checkControlSum(
+                mrz.subSequence(57, 63),
+                Character.getNumericValue(mrz[63])
+            ).not()
+        ) return null
 
-        if (checkControlSum(mrz.subSequence(72, 86), Character.getNumericValue(mrz[86])).not()) return null
+        if (mrz.substring(65, 71) != expirationDatePlaceholders) {
+            if (checkControlSum(
+                    mrz.subSequence(65, 71),
+                    Character.getNumericValue(mrz[71])
+                ).not()
+            ) {
+                return null
+            }
+        }
 
-
+        if (checkControlSum(
+                mrz.subSequence(72, 86),
+                Character.getNumericValue(mrz[86])
+            ).not()
+        ) return null
 
 
         val lastControlNumber = mrz[87]
@@ -155,21 +197,26 @@ object MrzHelper {
         mrzShort.append(mrz.subSequence(57, 64))
         mrzShort.append(mrz.subSequence(65, 87))
 
-        if (checkControlSum(mrzShort.toString(), Character.getNumericValue(lastControlNumber)).not()) return null
+        if (checkControlSum(
+                mrzShort.toString(),
+                Character.getNumericValue(lastControlNumber)
+            ).not()
+        ) return null
 
         return RecognizedMrz(
-                mrz,
-                mrz.substring(1, 2),
-                mrz.substring(2, 5),
-                mrz.substring(44, 53),
-                mrz.substring(57, 63),
-                mrz.substring(64, 65),
-                mrz.substring(65, 71),
-                mrz.substring(54, 57),
-                null,
-                null,
-                mrz.substring(72, 86),
-                null)
+            mrz,
+            mrz.substring(0, 2),
+            mrz.substring(2, 5),
+            mrz.substring(44, 53),
+            mrz.substring(57, 63),
+            mrz.substring(64, 65),
+            mrz.substring(65, 71),
+            mrz.substring(54, 57),
+            null,
+            null,
+            mrz.substring(72, 86),
+            null
+        )
     }
 
     private fun isNumber(char: Char): Boolean {
@@ -177,7 +224,7 @@ object MrzHelper {
     }
 
     private fun getLetterAlphabetPosition(char: Char): Int {
-        return when{
+        return when {
             (char == '<') || (char.code !in 65..90) -> 0
             else -> char.code - 64 + 9
         }
