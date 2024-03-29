@@ -2,6 +2,7 @@ package kg.nurtelecom.textrecognizer
 
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -25,6 +26,9 @@ class  MainActivity : AppCompatActivity() {
             viewBinding.tvMrz.setText((it as RecognizedMrz).toString())
         } ?: let {
             viewBinding.tvMrz.text = "Unable to recognize MRZ"
+        }
+        it?.getSerializableExtra(PhotoRecognizerActivity.EXTRA_MRZ_RECOGNITION_FAILURE)?.let {
+            Toast.makeText(this, "Не удалось прочитать", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -53,7 +57,7 @@ class  MainActivity : AppCompatActivity() {
                 }
 
             }
-            textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", true, overlayType = OverlayType.PASSPORT_OVERLAY, hasCustomPhotoConfirmation = false))
+            textRecognizerContract.launch(TextRecognizerConfig(false, 5, 20000,"Убедитесь, что паспорт полностью в кадре", true, overlayType = OverlayType.FOREIGNER_PASSPORT_OVERLAY, hasCustomPhotoConfirmation = false))
         }
         viewBinding.btn2.setOnClickListener {
             textRecognizerContract.launch(TextRecognizerConfig(false, 20, 20000,"Убедитесь, что паспорт полностью в кадре", true, overlayType = OverlayType.PASSPORT_OVERLAY, needRecognition = false))
