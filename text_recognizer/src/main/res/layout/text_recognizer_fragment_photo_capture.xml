@@ -60,7 +60,7 @@
         android:id="@+id/iv_foreigner_mask"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_passport_overlay"
+        android:src="@drawable/text_recognizer_foreigner_passport_mask"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/end_offset"
         app:layout_constraintStart_toStartOf="@id/start_offet"
