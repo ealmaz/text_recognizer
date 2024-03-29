@@ -11,6 +11,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.Toast
@@ -27,9 +29,7 @@ import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toRect
-import androidx.core.net.toUri
 import androidx.core.view.children
-import androidx.core.view.get
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -59,7 +59,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     private var previewOverlay: View? = null
 
     private val timeoutCountLimit: Int by lazy {
-        arguments?.getInt(ARG_TIMEOUT_COUNT) ?: 0
+        arguments?.getInt(ARG_TIMEOUT_COUNT) ?: 10
     }
 
     private val timeoutMills: Long by lazy {
@@ -237,7 +237,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             setOnClickListener { takePhoto() }
             isInvisible = needToRecognizeText
         }
-        vb.tvDescription.isVisible = needToRecognizeText && overlayType == OverlayType.RECTANGLE_OVERLAY
+        vb.tvDescription.isVisible = needToRecognizeText && (overlayType == OverlayType.RECTANGLE_OVERLAY || overlayType == OverlayType.FOREIGNER_PASSPORT_OVERLAY)
         vb.ivMask.isVisible = overlayType == OverlayType.RECTANGLE_OVERLAY
     }
 
@@ -332,24 +332,39 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private fun setupOverlayLabels(screenLabels: ScreenLabels?) {
         previewOverlay?.let { vb.flPreview.removeView(it) }
-        if (overlayType == OverlayType.PASSPORT_OVERLAY) {
-            PassportCardOverlay(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                setOverlayAlpha(102)
-                setHeaderText(R.string.text_recognizer_title_photo_capture)
-                setDescription(R.string.recognition_description)
-                screenLabels?.description?.let { setDescription(it) }
-                screenLabels?.title?.let { setTitle(it) }
-                screenLabels?.headerText?.let { setHeaderText(it) }
-                previewOverlay = this
-                vb.flPreview.addView(this)
+        when (overlayType) {
+            OverlayType.PASSPORT_OVERLAY -> {
+                PassportCardOverlay(requireContext()).apply {
+                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                    setOverlayAlpha(102)
+                    setHeaderText(R.string.text_recognizer_title_photo_capture)
+                    setDescription(R.string.recognition_description)
+                    screenLabels?.description?.let { setDescription(it) }
+                    screenLabels?.title?.let { setTitle(it) }
+                    screenLabels?.headerText?.let { setHeaderText(it) }
+                    previewOverlay = this
+                    vb.flPreview.addView(this)
+                }
             }
-        } else {
-            BlackRectangleOverlay(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
-                vb.tvDescription.setText(R.string.recognition_description_without_button)
-                previewOverlay = this
-                vb.flPreview.addView(this)
+
+            OverlayType.FOREIGNER_PASSPORT_OVERLAY -> {
+                BlackRectangleOverlay(requireContext()).apply {
+                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                    vb.tvDescription.setText(R.string.recognition_description_without_button)
+                    vb.ivMask.visibility = GONE
+                    vb.ivForeignerMask.visibility = VISIBLE
+                    previewOverlay = this
+                    vb.flPreview.addView(this)
+                }
+            }
+
+            else -> {
+                BlackRectangleOverlay(requireContext()).apply {
+                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                    vb.tvDescription.setText(R.string.recognition_description_without_button)
+                    previewOverlay = this
+                    vb.flPreview.addView(this)
+                }
             }
         }
     }

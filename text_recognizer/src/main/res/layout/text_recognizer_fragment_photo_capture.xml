@@ -56,6 +56,16 @@
         app:layout_constraintStart_toStartOf="@id/start_offet"
         app:layout_constraintEnd_toEndOf="@id/end_offset"/>
 
+    <ImageView
+        android:id="@+id/iv_foreigner_mask"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/text_recognizer_foreigner_passport_mask"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/end_offset"
+        app:layout_constraintStart_toStartOf="@id/start_offet"
+        app:layout_constraintTop_toTopOf="@id/foreigner_mask_offset" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/start_offet"
         android:layout_width="wrap_content"
@@ -68,7 +78,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.85"/>
+        app:layout_constraintGuide_percent="0.85" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/foreigner_mask_offset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.70" />
 
     <ImageView
         android:id="@+id/btn_capture"

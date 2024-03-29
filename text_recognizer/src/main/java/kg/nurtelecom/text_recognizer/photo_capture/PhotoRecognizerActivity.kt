@@ -105,6 +105,7 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
 
     override fun onRecognitionFail(ex: Exception?) {
         resultDataIntent.putExtra(EXTRA_MRZ_RECOGNITION_FAILURE, ex)
+        closeActivityWithData()
     }
 
     override fun onBackPressed() {
@@ -180,6 +181,7 @@ data class TextRecognizerConfig(
 enum class OverlayType {
     RECTANGLE_OVERLAY,
     PASSPORT_OVERLAY,
+    FOREIGNER_PASSPORT_OVERLAY
 }
 
 
