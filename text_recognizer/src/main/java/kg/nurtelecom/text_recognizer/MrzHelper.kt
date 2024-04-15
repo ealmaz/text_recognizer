@@ -30,7 +30,7 @@ object MrzHelper {
     fun isMrzValid(mrz: String): RecognizedMrz? {
         return when (mrz.length) {
             72 -> validateTd2(mrz)
-            88 -> validateTd3(mrz)
+            88 -> validateTd3(processMrz(mrz))
             else -> validateTd1(mrz)
         }
     }
@@ -160,8 +160,6 @@ object MrzHelper {
     private fun validateTd3(mrz: String): RecognizedMrz? {
         if (mrz.length < 88) return null
 
-        val expirationDatePlaceholders = "<<<<<<"
-
         if (checkControlSum(
                 mrz.subSequence(44, 53),
                 Character.getNumericValue(mrz[53])
@@ -174,14 +172,12 @@ object MrzHelper {
             ).not()
         ) return null
 
-        if (mrz.substring(65, 71) != expirationDatePlaceholders) {
+        if (!isPlaceholder(mrz.substring(65, 71))) {
             if (checkControlSum(
                     mrz.subSequence(65, 71),
                     Character.getNumericValue(mrz[71])
                 ).not()
-            ) {
-                return null
-            }
+            ) return null
         }
 
         if (checkControlSum(
@@ -189,7 +185,6 @@ object MrzHelper {
                 Character.getNumericValue(mrz[86])
             ).not()
         ) return null
-
 
         val lastControlNumber = mrz[87]
         val mrzShort = StringBuilder()
@@ -217,6 +212,21 @@ object MrzHelper {
             mrz.substring(72, 86),
             null
         )
+    }
+
+    private fun processMrz(originalMrz: String): String {
+        val firstLine = originalMrz.substring(0, 44)
+        val secondLine = originalMrz.substring(44).uppercase()
+
+        val processedSecondLine = secondLine.replace("NO".toRegex(), "N0")
+            .replace("CO".toRegex(), "C0")
+            .replace("OM".toRegex(), "0M")
+
+        return firstLine + processedSecondLine
+    }
+
+    private fun isPlaceholder(value: String): Boolean {
+        return value.all { it == '<' }
     }
 
     private fun isNumber(char: Char): Boolean {

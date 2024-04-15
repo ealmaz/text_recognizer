@@ -39,6 +39,3 @@ class KgPassportMrzRecognizer(recognizerCallback: TextRecognizerCallback) : Base
         }
     }
 }
-
-
-
