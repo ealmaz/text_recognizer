@@ -18,7 +18,6 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.AspectRatio
-import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
@@ -27,7 +26,6 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
-import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toRect
@@ -212,14 +210,11 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                 this, cameraSelector, preview, imageCapture
             )
             setUpTapToFocus(camera.cameraControl)
-            if (camera.cameraInfo.hasFlashUnit()) {
-                vb.btnFlash.setOnClickListener {
-                    toggleFlashlight(camera)
-                }
-            }
+
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
+
     }
 
     private fun setUpTapToFocus(cameraControl: CameraControl) {
@@ -275,14 +270,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                         output.savedUri
                     )
                 }
-            }
-        )
-    }
+            })
 
-    private fun toggleFlashlight(camera: Camera) {
-        val torchState = camera.cameraInfo.torchState.value
-        val isTorchOn = torchState == TorchState.ON
-        camera.cameraControl.enableTorch(!isTorchOn)
     }
 
     private fun cropImage(file: File): File? {
