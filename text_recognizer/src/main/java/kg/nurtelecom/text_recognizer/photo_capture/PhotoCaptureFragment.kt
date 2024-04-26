@@ -54,7 +54,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private var _vb: TextRecognizerFragmentPhotoCaptureBinding? = null
     private val vb: TextRecognizerFragmentPhotoCaptureBinding
-        get () = _vb!!
+        get() = _vb!!
 
     private var previewOverlay: View? = null
 
@@ -86,6 +86,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         arguments?.getSerializable(ARG_OVERLAY_TYPE) as? OverlayType
     }
 
+    private val passportMask: PassportMask? by lazy {
+        requireArguments().getSerializable(ARG_PASSPORT_MASK) as? PassportMask
+    }
+
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
 
     private var imageCapture: ImageCapture? = null
@@ -99,7 +103,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private val needToRecognizeText: Boolean
-        get () = arguments?.getBoolean(ARG_NEED_RECOGNITION) ?: true
+        get() = arguments?.getBoolean(ARG_NEED_RECOGNITION) ?: true
 
     private val countDownTimer: CountDownTimer by lazy {
         object : CountDownTimer(timeoutMills, 1000) {
@@ -124,14 +128,17 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         }
     }
 
-    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-        when (allPermissionsGranted()) {
-            true -> startCamera()
-            else -> onPermissionDenied()
+    private val requestPermission =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            when (allPermissionsGranted()) {
+                true -> startCamera()
+                else -> onPermissionDenied()
+            }
         }
-    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         _vb = TextRecognizerFragmentPhotoCaptureBinding.inflate(layoutInflater)
         return vb.root
     }
@@ -143,6 +150,15 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             else -> requestPermission.launch(REQUIRED_PERMISSIONS)
         }
         setupViews()
+        setupPassportMask()
+    }
+
+    private fun setupPassportMask() {
+        val passportMaskImage = when (passportMask) {
+            PassportMask.LIGHT_GREEN_PASSPORT_MASK -> R.drawable.text_recognizer_passport_mask_light_green
+            else -> R.drawable.text_recognizer_passport_mask
+        }
+        vb.ivMask.setImageDrawable(ContextCompat.getDrawable(requireContext(), passportMaskImage))
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -153,7 +169,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         vb.surfacePreview.post {
             cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
             cameraProviderFuture?.addListener({
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture?.get() ?: return@addListener
+                val cameraProvider: ProcessCameraProvider =
+                    cameraProviderFuture?.get() ?: return@addListener
                 bindUseCases(cameraProvider)
             }, ContextCompat.getMainExecutor(requireContext()))
         }
@@ -165,23 +182,18 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
         val rotation = vb.surfacePreview.display.rotation
 
-        val preview = Preview.Builder()
-            .setTargetRotation(rotation)
-            .setTargetAspectRatio(aspectRatio)
-            .build()
-            .also { it.setSurfaceProvider(vb.surfacePreview.surfaceProvider) }
+        val preview =
+            Preview.Builder().setTargetRotation(rotation).setTargetAspectRatio(aspectRatio).build()
+                .also { it.setSurfaceProvider(vb.surfacePreview.surfaceProvider) }
 
         setupOverlayLabels(recognitionLabels)
 
-        imageCapture = ImageCapture.Builder()
-            .setTargetRotation(rotation)
-            .setTargetAspectRatio(aspectRatio)
-            .build()
+        imageCapture =
+            ImageCapture.Builder().setTargetRotation(rotation).setTargetAspectRatio(aspectRatio)
+                .build()
 
 
-        val imageAnalysis = ImageAnalysis.Builder()
-            .build()
-            .apply {
+        val imageAnalysis = ImageAnalysis.Builder().build().apply {
                 setAnalyzer(cameraExecutor, imageAnalyzer)
             }
 
@@ -195,14 +207,11 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                 countDownTimer.start()
             }
             val camera = cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture
+                this, cameraSelector, preview, imageCapture
             )
             setUpTapToFocus(camera.cameraControl)
 
-        } catch(exc: Exception) {
+        } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
 
@@ -216,10 +225,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             vb.surfacePreview.performClick()
             return@setOnTouchListener try {
                 val action = SurfaceOrientedMeteringPointFactory(
-                    vb.surfacePreview.width.toFloat(),
-                    vb.surfacePreview.height.toFloat()
-                )
-                    .createPoint(event.x, event.y)
+                    vb.surfacePreview.width.toFloat(), vb.surfacePreview.height.toFloat()
+                ).createPoint(event.x, event.y)
                     .let { FocusMeteringAction.Builder(it, FocusMeteringAction.FLAG_AF).build() }
                 cameraControl.startFocusAndMetering(action)
                 true
@@ -237,47 +244,46 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             setOnClickListener { takePhoto() }
             isInvisible = needToRecognizeText
         }
-        vb.tvDescription.isVisible = needToRecognizeText && (overlayType == OverlayType.RECTANGLE_OVERLAY || overlayType == OverlayType.FOREIGNER_PASSPORT_OVERLAY)
+        vb.tvDescription.isVisible =
+            needToRecognizeText && (overlayType == OverlayType.RECTANGLE_OVERLAY || overlayType == OverlayType.FOREIGNER_PASSPORT_OVERLAY)
         vb.ivMask.isVisible = overlayType == OverlayType.RECTANGLE_OVERLAY
     }
 
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
-        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
-            .format(System.currentTimeMillis())
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US).format(System.currentTimeMillis())
 
         var tempFile: File = createTemporaryFiles(name, ".jpg")
 
-        val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(tempFile)
-            .build()
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(tempFile).build()
 
-        imageCapture.takePicture(
-            outputOptions,
+        imageCapture.takePicture(outputOptions,
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun onImageSaved(output: ImageCapture.OutputFileResults){
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     cropImage(tempFile)?.let { tempFile = it }
                     (tryGetActivity() as PhotoRecognizerActivityCallback).openPhotoConfirmationFragment(
                         output.savedUri
                     )
                 }
-            }
-        )
+            })
 
     }
 
     private fun cropImage(file: File): File? {
-        return PictureUtils.compressImage(file.absolutePath, 80, getImageCropRect(), resources.displayMetrics.heightPixels)
+        return PictureUtils.compressImage(
+            file.absolutePath, 80, getImageCropRect(), resources.displayMetrics.heightPixels
+        )
     }
 
     private fun getImageCropRect(): Rect? {
         return if (vb.flPreview.childCount <= 0) null
-        else (vb.flPreview.children.find { it is PassportCardOverlay } as? PassportCardOverlay)?.getPassportMaskRectF()?.toRect()
+        else (vb.flPreview.children.find { it is PassportCardOverlay } as? PassportCardOverlay)?.getPassportMaskRectF()
+            ?.toRect()
     }
 
     private fun setButtonVisibilityOrTakePicture() {
@@ -319,10 +325,17 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         _vb = null
     }
 
-    private fun createTemporaryFiles(prefix: String, suffix: String) : File {
+    private fun createTemporaryFiles(prefix: String, suffix: String): File {
         val directory = when (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            true -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/text_recognizer")
-            else -> File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/text_recognizer")
+            true -> File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "/text_recognizer"
+            )
+
+            else -> File(
+                requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                "/text_recognizer"
+            )
         }
         if (!directory.exists()) {
             directory.mkdirs()
@@ -335,7 +348,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         when (overlayType) {
             OverlayType.PASSPORT_OVERLAY -> {
                 PassportCardOverlay(requireContext()).apply {
-                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+                    )
                     setOverlayAlpha(102)
                     setHeaderText(R.string.text_recognizer_title_photo_capture)
                     setDescription(R.string.recognition_description)
@@ -349,7 +364,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
             OverlayType.FOREIGNER_PASSPORT_OVERLAY -> {
                 BlackRectangleOverlay(requireContext()).apply {
-                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+                    )
                     vb.tvDescription.setText(R.string.recognition_description_without_button)
                     vb.ivMask.visibility = GONE
                     vb.ivForeignerMask.visibility = VISIBLE
@@ -360,7 +377,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
             else -> {
                 BlackRectangleOverlay(requireContext()).apply {
-                    layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT
+                    )
                     vb.tvDescription.setText(R.string.recognition_description_without_button)
                     previewOverlay = this
                     vb.flPreview.addView(this)
@@ -379,16 +398,16 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         const val ARG_RECOGNITION_LABELS = "ARG_RECOGNITION_LABELS"
         const val ARG_PHOTO_CAPTURE_LABELS = "ARG_PHOTO_CAPTURE_LABELS"
         const val ARG_OVERLAY_TYPE = "arg_overlay_type"
+        const val ARG_PASSPORT_MASK = "arg_passport_mask"
 
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private val REQUIRED_PERMISSIONS =
-            mutableListOf (
-                Manifest.permission.CAMERA
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
+        private val REQUIRED_PERMISSIONS = mutableListOf(
+            Manifest.permission.CAMERA
+        ).apply {
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }.toTypedArray()
     }
 }
