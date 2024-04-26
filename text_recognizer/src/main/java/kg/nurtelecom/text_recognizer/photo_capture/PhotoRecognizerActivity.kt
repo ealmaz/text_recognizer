@@ -43,6 +43,7 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
                 PhotoCaptureFragment.ARG_PHOTO_CAPTURE_LABELS to textRecognizerConfig?.photoCaptureLabels,
                 PhotoCaptureFragment.ARG_RECOGNITION_LABELS to textRecognizerConfig?.recognitionLabels,
                 PhotoCaptureFragment.ARG_OVERLAY_TYPE to textRecognizerConfig?.overlayType,
+                PhotoCaptureFragment.ARG_PASSPORT_MASK to textRecognizerConfig?.passportMask
             )
         }
         startFragment(cameraFragment)
@@ -176,7 +177,13 @@ data class TextRecognizerConfig(
     val overlayType: OverlayType? = OverlayType.PASSPORT_OVERLAY,
     val hasCustomPhotoConfirmation: Boolean = false,
     val needRecognition: Boolean = true,
+    val passportMask:PassportMask = PassportMask.SIMPLE_GRAY_PASSPORT_MASK
 ): Serializable
+
+enum class PassportMask{
+    SIMPLE_GRAY_PASSPORT_MASK,
+    LIGHT_GREEN_PASSPORT_MASK
+}
 
 enum class OverlayType {
     RECTANGLE_OVERLAY,
