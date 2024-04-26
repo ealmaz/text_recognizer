@@ -86,6 +86,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         arguments?.getSerializable(ARG_OVERLAY_TYPE) as? OverlayType
     }
 
+    private val passportMask: PassportMask? by lazy {
+        requireArguments().getSerializable(ARG_PASSPORT_MASK) as? PassportMask
+    }
+
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
 
     private var imageCapture: ImageCapture? = null
@@ -143,6 +147,15 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             else -> requestPermission.launch(REQUIRED_PERMISSIONS)
         }
         setupViews()
+        setupPassportMask()
+    }
+
+    private fun setupPassportMask() {
+        val passportMaskImage = when (passportMask) {
+            PassportMask.LIGHT_GREEN_PASSPORT_MASK -> R.drawable.text_recognizer_passport_mask_light_green
+            else -> R.drawable.text_recognizer_passport_mask
+        }
+        vb.ivMask.setImageDrawable(ContextCompat.getDrawable(requireContext(), passportMaskImage))
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -364,6 +377,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         const val ARG_RECOGNITION_LABELS = "ARG_RECOGNITION_LABELS"
         const val ARG_PHOTO_CAPTURE_LABELS = "ARG_PHOTO_CAPTURE_LABELS"
         const val ARG_OVERLAY_TYPE = "arg_overlay_type"
+        const val ARG_PASSPORT_MASK = "arg_passport_mask"
 
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
