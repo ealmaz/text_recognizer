@@ -92,6 +92,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         requireArguments().getSerializable(ARG_PASSPORT_MASK) as? PassportMask
     }
 
+    private val isFlashlightEnabled: Boolean? by lazy {
+        requireArguments().getBoolean(ARG_FLASHLIGHT)
+    }
+
     private var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>? = null
 
     private var imageCapture: ImageCapture? = null
@@ -196,9 +200,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
 
         val imageAnalysis = ImageAnalysis.Builder().build().apply {
-                setAnalyzer(cameraExecutor, imageAnalyzer)
-            }
-
+            setAnalyzer(cameraExecutor, imageAnalyzer)
+        }
 
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -212,10 +215,17 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                 this, cameraSelector, preview, imageCapture
             )
             setUpTapToFocus(camera.cameraControl)
-            if (camera.cameraInfo.hasFlashUnit()) {
-                vb.btnFlash.setOnClickListener {
-                    toggleFlashlight(camera)
+            vb.btnFlash.visibility = when (isFlashlightEnabled) {
+                true -> if (camera.cameraInfo.hasFlashUnit()) {
+                    vb.btnFlash.setOnClickListener {
+                        toggleFlashlight(camera)
+                    }
+                    VISIBLE
+                } else {
+                    GONE
                 }
+
+                else -> GONE
             }
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
@@ -301,7 +311,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         if (autoPhotoCapture) {
             takePhoto()
         } else {
-            vb.btnCapture.visibility = View.VISIBLE
+            vb.btnCapture.visibility = VISIBLE
             setupOverlayLabels(photoCaptureLabels)
         }
     }
@@ -410,6 +420,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         const val ARG_PHOTO_CAPTURE_LABELS = "ARG_PHOTO_CAPTURE_LABELS"
         const val ARG_OVERLAY_TYPE = "arg_overlay_type"
         const val ARG_PASSPORT_MASK = "arg_passport_mask"
+        const val ARG_FLASHLIGHT = "arg_flashlight"
 
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"

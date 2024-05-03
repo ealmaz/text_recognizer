@@ -13,7 +13,7 @@
         android:layout_marginTop="@dimen/padding_16dp"
         android:background="@drawable/chili_ic_back_arrow"
         android:backgroundTint="@color/white_1"
-        android:elevation="5dp"
+        android:elevation="@dimen/elevation_4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -24,8 +24,9 @@
         android:layout_marginTop="@dimen/padding_16dp"
         android:layout_marginEnd="@dimen/padding_16dp"
         android:contentDescription="@null"
-        android:elevation="5dp"
+        android:elevation="@dimen/elevation_4dp"
         android:src="@drawable/ic_flash"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
