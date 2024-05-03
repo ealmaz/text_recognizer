@@ -81,8 +81,7 @@ class MainActivity : AppCompatActivity() {
                     true,
                     overlayType = OverlayType.RECTANGLE_OVERLAY,
                     needRecognition = false,
-                    passportMask = PassportMask.LIGHT_GREEN_PASSPORT_MASK,
-                    isFlashlightEnabled =
+                    passportMask = PassportMask.LIGHT_GREEN_PASSPORT_MASK
                 )
             )
         }
