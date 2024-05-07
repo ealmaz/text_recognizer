@@ -16,7 +16,8 @@ import kg.nurtelecom.text_recognizer.photo_capture.PhotoRecognizerActivity.Compa
 import java.io.File
 import java.io.Serializable
 
-class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback, RecognitionFailureListener {
+class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCallback,
+    RecognitionFailureListener {
 
     private val resultDataIntent: Intent = Intent()
     private var recognizedData: RecognizedMrz? = null
@@ -43,7 +44,8 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
                 PhotoCaptureFragment.ARG_PHOTO_CAPTURE_LABELS to textRecognizerConfig?.photoCaptureLabels,
                 PhotoCaptureFragment.ARG_RECOGNITION_LABELS to textRecognizerConfig?.recognitionLabels,
                 PhotoCaptureFragment.ARG_OVERLAY_TYPE to textRecognizerConfig?.overlayType,
-                PhotoCaptureFragment.ARG_PASSPORT_MASK to textRecognizerConfig?.passportMask
+                PhotoCaptureFragment.ARG_PASSPORT_MASK to textRecognizerConfig?.passportMask,
+                PhotoCaptureFragment.ARG_FLASHLIGHT to textRecognizerConfig?.isFlashlightEnabled
             )
         }
         startFragment(cameraFragment)
@@ -57,7 +59,8 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
         val confirmationFragment = PhotoConfirmationFragment()
         confirmationFragment.arguments = bundleOf(
             PhotoConfirmationFragment.ARG_FILE_URI to uri,
-            PhotoConfirmationFragment.ARG_SHOULD_RECOGNIZE_ON_RETRY to (textRecognizerConfig?.shouldRecognizeOnRetry ?: false),
+            PhotoConfirmationFragment.ARG_SHOULD_RECOGNIZE_ON_RETRY to (textRecognizerConfig?.shouldRecognizeOnRetry
+                ?: false),
             PhotoConfirmationFragment.ARG_CONFIRMATION_LABELS to textRecognizerConfig?.confirmationLabels
         )
         startFragment(confirmationFragment)
@@ -177,10 +180,11 @@ data class TextRecognizerConfig(
     val overlayType: OverlayType? = OverlayType.PASSPORT_OVERLAY,
     val hasCustomPhotoConfirmation: Boolean = false,
     val needRecognition: Boolean = true,
-    val passportMask:PassportMask = PassportMask.SIMPLE_GRAY_PASSPORT_MASK
-): Serializable
+    val passportMask: PassportMask = PassportMask.SIMPLE_GRAY_PASSPORT_MASK,
+    val isFlashlightEnabled: Boolean = false
+) : Serializable
 
-enum class PassportMask{
+enum class PassportMask {
     SIMPLE_GRAY_PASSPORT_MASK,
     LIGHT_GREEN_PASSPORT_MASK
 }
@@ -196,8 +200,13 @@ data class ScreenLabels(
     val headerText: String? = null,
     val title: String? = null,
     val description: String? = null
-): Serializable
+) : Serializable
 
-interface FileUploader{
-    fun uploadRecognizedPhoto(file: File, recognizedMrz: RecognizedMrz?, onSuccess: () -> Unit, onFail: (warningMessage: String, finishOnFail: Boolean) -> Unit)
+interface FileUploader {
+    fun uploadRecognizedPhoto(
+        file: File,
+        recognizedMrz: RecognizedMrz?,
+        onSuccess: () -> Unit,
+        onFail: (warningMessage: String, finishOnFail: Boolean) -> Unit
+    )
 }
