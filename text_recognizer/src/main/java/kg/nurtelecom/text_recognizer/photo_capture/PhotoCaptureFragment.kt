@@ -166,7 +166,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         vb.surfacePreview.post {
             cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
             cameraProviderFuture?.addListener({
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture?.get() ?: return@addListener
+                val cameraProvider: ProcessCameraProvider =
+                    cameraProviderFuture?.get() ?: return@addListener
                 bindUseCases(cameraProvider)
             }, ContextCompat.getMainExecutor(requireContext()))
         }
@@ -215,7 +216,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             )
             setUpTapToFocus(camera.cameraControl)
 
-        } catch(exc: Exception) {
+        } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
         }
 
@@ -250,7 +251,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             setOnClickListener { takePhoto() }
             isInvisible = needToRecognizeText
         }
-        vb.tvDescription.isVisible = needToRecognizeText && overlayType == OverlayType.RECTANGLE_OVERLAY
+        vb.tvDescription.isVisible =
+            needToRecognizeText && overlayType == OverlayType.RECTANGLE_OVERLAY
         vb.ivMask.isVisible = overlayType == OverlayType.RECTANGLE_OVERLAY
     }
 
@@ -273,7 +275,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun onImageSaved(output: ImageCapture.OutputFileResults){
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     cropImage(tempFile)?.let { tempFile = it }
                     (tryGetActivity() as PhotoRecognizerActivityCallback).openPhotoConfirmationFragment(
                         output.savedUri
@@ -332,10 +334,17 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         _vb = null
     }
 
-    private fun createTemporaryFiles(prefix: String, suffix: String) : File {
+    private fun createTemporaryFiles(prefix: String, suffix: String): File {
         val directory = when (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            true -> File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "/text_recognizer")
-            else -> File(requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/text_recognizer")
+            true -> File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                "/text_recognizer"
+            )
+
+            else -> File(
+                requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                "/text_recognizer"
+            )
         }
         if (!directory.exists()) {
             directory.mkdirs()
@@ -347,7 +356,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         previewOverlay?.let { vb.flPreview.removeView(it) }
         if (overlayType == OverlayType.PASSPORT_OVERLAY) {
             PassportCardOverlay(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
                 setOverlayAlpha(102)
                 setHeaderText(R.string.text_recognizer_title_photo_capture)
                 setDescription(R.string.recognition_description)
@@ -359,7 +371,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             }
         } else {
             BlackRectangleOverlay(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT)
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.MATCH_PARENT,
+                    FrameLayout.LayoutParams.MATCH_PARENT
+                )
                 vb.tvDescription.setText(R.string.recognition_description_without_button)
                 previewOverlay = this
                 vb.flPreview.addView(this)
@@ -381,13 +396,23 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private val REQUIRED_PERMISSIONS =
-            mutableListOf (
+        private val REQUIRED_PERMISSIONS = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
+                Manifest.permission.READ_MEDIA_IMAGES,
                 Manifest.permission.CAMERA
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
+            )
+
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ->
+                arrayOf(Manifest.permission.CAMERA)
+
+
+            else -> {
+                arrayOf(
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
+            }
+        }
     }
 }
