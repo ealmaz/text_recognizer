@@ -27,9 +27,7 @@ import androidx.camera.core.SurfaceOrientedMeteringPointFactory
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toRect
-import androidx.core.net.toUri
 import androidx.core.view.children
-import androidx.core.view.get
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -115,6 +113,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private var timeoutCount = 0
+
+    private var isPhotoCapturing = false
 
     private fun handleOnTimeOut() {
         timeoutCount++
@@ -257,7 +257,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private fun takePhoto() {
+        if (isPhotoCapturing) return
         val imageCapture = imageCapture ?: return
+        isPhotoCapturing = true
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
 
@@ -272,6 +274,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             ContextCompat.getMainExecutor(requireContext()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
+                    isPhotoCapturing = false
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
@@ -332,6 +335,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         cameraExecutor.shutdown()
         countDownTimer.cancel()
         _vb = null
+        isPhotoCapturing = false
     }
 
     private fun createTemporaryFiles(prefix: String, suffix: String): File {
