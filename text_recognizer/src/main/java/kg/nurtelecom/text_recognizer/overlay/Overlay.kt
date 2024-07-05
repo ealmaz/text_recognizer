@@ -17,7 +17,7 @@ open abstract class Overlay@JvmOverloads constructor(context: Context,
     protected lateinit var paint: Paint
     private lateinit var auxCanvas: Canvas
 
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         canvasWidth = canvas!!.width
         canvasHeight = canvas.height

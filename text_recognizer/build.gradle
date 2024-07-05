@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 23
-        targetSdk 33
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -38,7 +38,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
 
-    implementation 'com.github.ealmaz:DesignChili2:0.0.0.288'
+    implementation 'com.github.ealmaz:DesignChili2:0.0.0.309'
     implementation 'com.google.guava:guava:29.0-android'
 
     def camerax_version = "1.0.2"
