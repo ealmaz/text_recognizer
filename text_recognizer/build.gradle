@@ -5,6 +5,9 @@ plugins {
 }
 
 android {
+
+    namespace 'kg.nurtelecom.text_recognizer'
+
     compileSdk 34
 
     defaultConfig {
@@ -38,7 +41,7 @@ dependencies {
 
     implementation 'com.google.android.gms:play-services-mlkit-text-recognition:19.0.0'
 
-    implementation 'com.github.ealmaz:DesignChili2:1.0.85'
+    implementation 'com.github.ealmaz:DesignChili2:1.0.166_test'
     implementation 'com.google.guava:guava:29.0-android'
 
     def camerax_version = "1.0.2"
