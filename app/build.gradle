@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    namespace 'kg.nurtelecom.textrecognizer'
+
     compileSdk 34
 
     defaultConfig {
@@ -38,7 +40,7 @@ dependencies {
 
     implementation project(':text_recognizer')
 
-    implementation 'com.github.ealmaz:DesignChili2:1.0.85'
+    implementation 'com.github.ealmaz:DesignChili2:1.0.195'
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'
