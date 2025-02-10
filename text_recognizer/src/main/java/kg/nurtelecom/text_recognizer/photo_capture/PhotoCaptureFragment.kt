@@ -401,14 +401,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private val REQUIRED_PERMISSIONS = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> arrayOf(
-                Manifest.permission.READ_MEDIA_IMAGES,
-                Manifest.permission.CAMERA
-            )
-
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ->
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.R ->
                 arrayOf(Manifest.permission.CAMERA)
-
 
             else -> {
                 arrayOf(
