@@ -11,7 +11,7 @@
         android:layout_height="24dp"
         android:layout_marginStart="@dimen/padding_16dp"
         android:layout_marginTop="@dimen/padding_16dp"
-        android:background="@drawable/chili_ic_back_arrow"
+        android:background="@drawable/chili_ic_back"
         android:backgroundTint="@color/white_1"
         android:elevation="5dp"
         app:layout_constraintStart_toStartOf="parent"
