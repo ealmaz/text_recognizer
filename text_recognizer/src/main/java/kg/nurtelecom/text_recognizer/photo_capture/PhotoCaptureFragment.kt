@@ -39,6 +39,7 @@ import kg.nurtelecom.text_recognizer.RecognizedMrz
 import kg.nurtelecom.text_recognizer.analyzer.BaseImageAnalyzer
 import kg.nurtelecom.text_recognizer.analyzer.ImageAnalyzerCallback
 import kg.nurtelecom.text_recognizer.analyzer.KgPassportImageAnalyzer
+import kg.nurtelecom.text_recognizer.analyzer.PassportImageAnalyzer
 import kg.nurtelecom.text_recognizer.databinding.TextRecognizerFragmentPhotoCaptureBinding
 import kg.nurtelecom.text_recognizer.overlay.BlackRectangleOverlay
 import kg.nurtelecom.text_recognizer.util.PictureUtils
@@ -55,6 +56,10 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         get () = _vb!!
 
     private var previewOverlay: View? = null
+
+    private val isSimplifiedRecognition: Boolean by lazy {
+        arguments?.getBoolean(ARG_IS_SIMPLIFIED_RECOGNITION, false) ?: false
+    }
 
     private val timeoutCountLimit: Int by lazy {
         arguments?.getInt(ARG_TIMEOUT_COUNT) ?: 0
@@ -97,7 +102,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private val imageAnalyzer: BaseImageAnalyzer by lazy {
-        KgPassportImageAnalyzer(this@PhotoCaptureFragment)
+        if (isSimplifiedRecognition) PassportImageAnalyzer(this@PhotoCaptureFragment)
+        else KgPassportImageAnalyzer(this@PhotoCaptureFragment)
     }
 
     private val needToRecognizeText: Boolean
@@ -388,6 +394,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     companion object {
 
+        const val ARG_IS_SIMPLIFIED_RECOGNITION = "ARG_IS_SIMPLIFIED_RECOGNITION"
         const val ARG_NEED_RECOGNITION = "arg_need_recognition"
         const val ARG_TIMEOUT_MILLS = "ARG_TIMEOUT_MILLS"
         const val ARG_TIMEOUT_COUNT = "ARG_TIMEOUT_COUNT"
