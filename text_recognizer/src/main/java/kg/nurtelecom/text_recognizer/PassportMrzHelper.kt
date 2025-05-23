@@ -10,7 +10,13 @@ object PassportMrzHelper {
 
     fun parseMrzFromRawText(rawText: Text): List<String> {
         return rawText.textBlocks
-            .filter { it.text.contains("<") && it.text.length in 29..45 }
+            .filter {
+                val text = it.text.replace(" ", "")
+               (text.contains("<") && text.length in 28..45)
+                       || (text.length in 29..31)
+                       || (text.length in 35..37)
+                       || (text.length in 43..45)
+            }
             .map { prepareMrz(it.text) }
     }
 
@@ -35,15 +41,15 @@ object PassportMrzHelper {
     }
 
     private fun isTD1(lines: List<String>): Boolean {
-        return lines.size == 3 && lines.all { it.length in 29..31 }
+        return lines.size == 3 && lines.all { it.length in 28..31 }
     }
 
     private fun isTD2(lines: List<String>): Boolean {
-        return lines.size == 2 && lines.all { it.length in 35..37 }
+        return lines.size == 2 && lines.all { it.length in 34..37 }
     }
 
     private fun isTD3(lines: List<String>): Boolean {
-        return lines.size == 2 && lines.all { it.length in 43..45 }
+        return lines.size == 2 && lines.all { it.length in 42..45 }
     }
 
     private fun parseTd1(lines: List<String>): RecognizedMrz? {
@@ -61,7 +67,7 @@ object PassportMrzHelper {
 
         return RecognizedMrz(
             first + second + third,
-            first.substring(1, 2),
+            first.substring(0, 2).replace("<", ""),
             first.substring(2, 5),
             first.substring(5, 14),
             second.substring(0, 6),
@@ -89,7 +95,7 @@ object PassportMrzHelper {
 
         return RecognizedMrz(
             first + second,
-            first.substring(1, 2),
+            first.substring(0, 2).replace("<", ""),
             first.substring(2, 5),
             second.substring(0, 9),
             second.substring(13, 19),
@@ -116,7 +122,7 @@ object PassportMrzHelper {
 
         return RecognizedMrz(
             first + second,
-            first.substring(1, 2),
+            first.substring(0, 2).replace("<", ""),
             first.substring(2, 5),
             second.substring(0, 9),
             second.substring(13, 19),
