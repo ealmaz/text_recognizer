@@ -7,5 +7,6 @@
     <string name="check_passport">Проверьте паспорт</string>
     <string name="capture_confirmation_text">Is the data clearly visible?</string>
     <string name="text_recognizer_title_photo_capture">Passport back photo</string>
+    <string name="text_recognizer_title_front_photo_capture">Passport front photo</string>
 
 </resources>

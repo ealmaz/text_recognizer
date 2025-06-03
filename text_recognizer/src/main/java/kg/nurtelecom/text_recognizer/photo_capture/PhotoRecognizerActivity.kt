@@ -191,6 +191,7 @@ enum class PassportMask {
 enum class OverlayType {
     RECTANGLE_OVERLAY,
     PASSPORT_OVERLAY,
+    FOREIGN_PASSPORT_OVERLAY,
 }
 
 

@@ -7,4 +7,5 @@
     <string name="check_passport">Проверьте паспорт</string>
     <string name="capture_confirmation_text">Данные отчетливо видны?</string>
     <string name="text_recognizer_title_photo_capture">Фото с оборотной стороны\nпаспорта</string>
+    <string name="text_recognizer_title_front_photo_capture">Фото лицевой стороны\nпаспорта</string>
 </resources>

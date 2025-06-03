@@ -7,5 +7,6 @@
     <string name="check_passport">Проверьте паспорт</string>
     <string name="capture_confirmation_text">Маалыматтар так көрүнүп жатабы?</string>
     <string name="text_recognizer_title_photo_capture">Паспорттун арткы бетинин\nсүрөтү</string>
+    <string name="text_recognizer_title_front_photo_capture">Паспорттун бет жагынын сүрөтү</string>
 
 </resources>

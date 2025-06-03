@@ -32,6 +32,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.design2.chili2.view.camera_overlays.ForeignPassportOverlay
 import com.design2.chili2.view.camera_overlays.PassportCardOverlay
 import com.google.common.util.concurrent.ListenableFuture
 import kg.nurtelecom.text_recognizer.R
@@ -300,8 +301,15 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
     }
 
     private fun getImageCropRect(): Rect? {
-        return if (vb.flPreview.childCount <= 0) null
-        else (vb.flPreview.children.find { it is PassportCardOverlay } as? PassportCardOverlay)?.getPassportMaskRectF()?.toRect()
+        return when {
+            vb.flPreview.childCount <= 0 -> null
+            overlayType == OverlayType.FOREIGN_PASSPORT_OVERLAY -> {
+                (vb.flPreview.children.find { it is ForeignPassportOverlay } as? ForeignPassportOverlay)?.getPassportMaskRectF()?.toRect()
+            }
+            else -> {
+                (vb.flPreview.children.find { it is PassportCardOverlay } as? PassportCardOverlay)?.getPassportMaskRectF()?.toRect()
+            }
+        }
     }
 
     private fun setButtonVisibilityOrTakePicture() {
@@ -364,30 +372,47 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
     private fun setupOverlayLabels(screenLabels: ScreenLabels?) {
         previewOverlay?.let { vb.flPreview.removeView(it) }
-        if (overlayType == OverlayType.PASSPORT_OVERLAY) {
-            PassportCardOverlay(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                setOverlayAlpha(102)
-                setHeaderText(R.string.text_recognizer_title_photo_capture)
-                setDescription(R.string.recognition_description)
-                screenLabels?.description?.let { setDescription(it) }
-                screenLabels?.title?.let { setTitle(it) }
-                screenLabels?.headerText?.let { setHeaderText(it) }
-                previewOverlay = this
-                vb.flPreview.addView(this)
+        when(overlayType) {
+            OverlayType.PASSPORT_OVERLAY -> {
+                PassportCardOverlay(requireContext()).apply {
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                    )
+                    setOverlayAlpha(102)
+                    setHeaderText(R.string.text_recognizer_title_photo_capture)
+                    setDescription(R.string.recognition_description)
+                    screenLabels?.description?.let { setDescription(it) }
+                    screenLabels?.title?.let { setTitle(it) }
+                    screenLabels?.headerText?.let { setHeaderText(it) }
+                    previewOverlay = this
+                    vb.flPreview.addView(this)
+                }
             }
-        } else {
-            BlackRectangleOverlay(requireContext()).apply {
-                layoutParams = FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.MATCH_PARENT,
-                    FrameLayout.LayoutParams.MATCH_PARENT
-                )
-                vb.tvDescription.setText(R.string.recognition_description_without_button)
-                previewOverlay = this
-                vb.flPreview.addView(this)
+            OverlayType.FOREIGN_PASSPORT_OVERLAY -> {
+                ForeignPassportOverlay(requireContext()).apply {
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                    )
+                    setOverlayAlpha(102)
+                    setHeaderText(R.string.text_recognizer_title_front_photo_capture)
+                    screenLabels?.description?.let { setDescription(it) }
+                    screenLabels?.headerText?.let { setHeaderText(it) }
+                    previewOverlay = this
+                    vb.flPreview.addView(this)
+                }
+            }
+            else -> {
+                BlackRectangleOverlay(requireContext()).apply {
+                    layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                    )
+                    vb.tvDescription.setText(R.string.recognition_description_without_button)
+                    previewOverlay = this
+                    vb.flPreview.addView(this)
+                }
             }
         }
     }
