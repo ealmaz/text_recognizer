@@ -397,7 +397,6 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                     )
                     setOverlayAlpha(102)
                     setHeaderText(R.string.text_recognizer_title_front_photo_capture)
-                    screenLabels?.description?.let { setDescription(it) }
                     screenLabels?.headerText?.let { setHeaderText(it) }
                     previewOverlay = this
                     vb.flPreview.addView(this)
