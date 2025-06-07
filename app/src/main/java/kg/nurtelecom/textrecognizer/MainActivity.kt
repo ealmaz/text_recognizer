@@ -65,7 +65,8 @@ class MainActivity : AppCompatActivity() {
                     true,
                     overlayType = OverlayType.RECTANGLE_OVERLAY,
                     hasCustomPhotoConfirmation = false,
-                    passportMask = PassportMask.LIGHT_GREEN_PASSPORT_MASK
+                    passportMask = PassportMask.LIGHT_GREEN_PASSPORT_MASK,
+                    isSimplifiedRecognition = true
                 )
             )
         }

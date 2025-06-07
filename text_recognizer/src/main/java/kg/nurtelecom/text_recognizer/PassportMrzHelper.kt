@@ -2,28 +2,33 @@ package kg.nurtelecom.text_recognizer
 
 import com.google.mlkit.vision.text.Text
 import kotlin.math.abs
-import kotlin.text.StringBuilder
 
 object PassportMrzHelper {
 
     private val numbersWeights = listOf(7, 3, 1)
+    private const val TD3_LENGTH = 44
+    private const val TD2_LENGTH = 36
+    private const val TD1_LENGTH = 30
 
     fun parseMrzFromRawText(rawText: Text): List<String> {
         return rawText.textBlocks
+            .flatMap { it.text.split("\n") }
             .filter {
-                val text = it.text.replace(" ", "")
-               (text.contains("<") && text.length in 28..45)
-                       || (text.length in 29..31)
-                       || (text.length in 35..37)
-                       || (text.length in 43..45)
+                val text = it.replace(" ", "")
+               (text.contains("<") && text.length in TD1_LENGTH-2..TD3_LENGTH)
+                       || (text.length in TD1_LENGTH-2..TD1_LENGTH)
+                       || (text.length in TD2_LENGTH-2..TD2_LENGTH)
+                       || (text.length in TD3_LENGTH-2..TD3_LENGTH)
+                       || isNonFullFirstLine(text)
             }
-            .map { prepareMrz(it.text) }
+            .map { prepareMrz(it) }
     }
 
     private fun prepareMrz(rawMrz: String): String {
-        return rawMrz
+        val text = if (isNonFullFirstLine(rawMrz)) rawMrz.padEnd(TD3_LENGTH, '<') else rawMrz
+        return text
             .replace("«", "<")
-            .replace("[ce]".toRegex(), "<")
+            .replace("[ces]".toRegex(), "<")
             .replace("((?![A-Za-z0-9<]).)".toRegex(), "")
             .replace("\n", "")
             .replace("1D", "ID")
@@ -31,39 +36,60 @@ object PassportMrzHelper {
             .replace("(IDO|IDО)".toRegex(), "ID0")
     }
 
+    private fun isNonFullFirstLine(line: String): Boolean {
+        return (line.startsWith("P") && line.contains("<<<") && line.length in 10..33)
+    }
+
     fun getValidMrzData(lines: List<String>): RecognizedMrz? {
+        val td3Lines = isTD3(lines)
+        val td2Lines = isTD2(lines)
         return when {
-            isTD1(lines) -> parseTd1(lines)
-            isTD2(lines) -> parseTd2(lines)
-            isTD3(lines) -> parseTd3(lines)
-            else -> null
+            td3Lines != null -> parseTd3(td3Lines)
+            td2Lines != null -> parseTd2(td2Lines)
+            else -> parseTd1(lines)
         }
     }
 
-    private fun isTD1(lines: List<String>): Boolean {
-        return lines.size == 3 && lines.all { it.length in 28..31 }
+    private fun isTD2(lines: List<String>): List<String>? {
+        val lastTwoLines  = lines.filter { it.length in TD2_LENGTH-2..TD2_LENGTH }.takeLast(2).takeIf {
+            it.size == 2 && it.all { line -> line.length in TD2_LENGTH-2..TD2_LENGTH } }
+        return lastTwoLines
     }
 
-    private fun isTD2(lines: List<String>): Boolean {
-        return lines.size == 2 && lines.all { it.length in 34..37 }
-    }
-
-    private fun isTD3(lines: List<String>): Boolean {
-        return lines.size == 2 && lines.all { it.length in 42..45 }
+    private fun isTD3(lines: List<String>): List<String>? {
+        val lastTwoLines  = lines.filter { it.length in TD3_LENGTH-2..TD3_LENGTH }.takeLast(2).takeIf {
+            it.size == 2 && it.all { line -> line.length in TD3_LENGTH-2..TD3_LENGTH } }
+        return lastTwoLines
     }
 
     private fun parseTd1(lines: List<String>): RecognizedMrz? {
-        val first = validateLength(lines[0], 30)
-        val second = validateSecondLength(lines[1], 30, 1)
-        val third = validateLength(lines[2], 30)
+        val lastThreeLines = lines.filter { it.length in TD1_LENGTH-2..TD1_LENGTH }.takeLast(3)
+        if (lastThreeLines.size < 2) return null
+        val first = validateLength(lines[0], TD1_LENGTH)
+        val second = validateSecondLength(lines[1], TD1_LENGTH, 1)
+        val third = lines.getOrNull(2)?.let { validateLength(it, TD1_LENGTH) } ?: String()
+
+        // Check first line -> 14(check number index): 5-14 (number sequence, index from - index to + 1)
+        if (checkControlSum(first.subSequence(5, 14), Character.getNumericValue(first[14])).not()) return null
+
+        // Check second line -> 36: 30-36
+        if (checkControlSum(second.subSequence(0, 6), Character.getNumericValue(second[6])).not()) return null
+
+        // Check second line -> 44: 38-44
+        if (checkControlSum(second.subSequence(8, 14), Character.getNumericValue(second[14])).not()) return null
 
         val checkStr = StringBuilder()
         checkStr.append(first.subSequence(5, 30))
         checkStr.append(second.subSequence(0, 7))
         checkStr.append(second.subSequence(8, 15))
         checkStr.append(second.subSequence(18, 29))
+
         val checkDigit = Character.getNumericValue(second[29])
         if (checkControlSum(checkStr, checkDigit).not()) return null
+
+        val nameSection = third.split("<<")
+        val surname = nameSection.getOrNull(0)?.replace("<", " ")?.trim()
+        val givenNames = nameSection.getOrNull(1)?.replace("<", " ")?.trim()
 
         return RecognizedMrz(
             first + second + third,
@@ -74,24 +100,38 @@ object PassportMrzHelper {
             second.substring(7, 8),
             second.substring(8, 14),
             second.substring(15, 18),
-            null,
-            null,
+            surname,
+            givenNames,
             first.substring(15, 30),
             second.substring(18, 29)
         )
     }
 
     private fun parseTd2(lines: List<String>): RecognizedMrz? {
-        val first = validateLength(lines[0], 36)
-        val second = validateSecondLength(lines[1], 36, 1)
+        val first = getValidTD2FirstLine(lines[0]) ?: return null
+        val second = validateSecondLength(lines[1], TD2_LENGTH, 1)
+
+        // Check Passport number control sum
+        if (checkControlSum(second.subSequence(0, 9), Character.getNumericValue(second[9])).not()) return null
+
+        // Check Date of Birth control sum
+        if (checkControlSum(second.subSequence(13, 19), Character.getNumericValue(second[19])).not()) return null
+
+        // Check Date of Expiry control sum
+        if (checkControlSum(second.subSequence(21, 27), Character.getNumericValue(second[27])).not()) return null
 
         val checkStr = StringBuilder()
         checkStr.append(second.subSequence(0, 10))
         checkStr.append(second.subSequence(13, 20))
         checkStr.append(second.subSequence(21, 35))
 
+        // Check overall control sum
         val mainControlNumber = Character.getNumericValue(second[35])
         if (checkControlSum(checkStr, mainControlNumber).not()) return null
+
+        val nameSection = first.substring(5).split("<<")
+        val surname = nameSection.getOrNull(0)?.replace("<", " ")?.trim()
+        val givenNames = nameSection.getOrNull(1)?.replace("<", " ")?.trim()
 
         return RecognizedMrz(
             first + second,
@@ -102,23 +142,38 @@ object PassportMrzHelper {
             second.substring(20, 21),
             second.substring(21, 27),
             second.substring(10, 13),
-            null,
-            null,
+            surname,
+            givenNames,
             second.substring(28, 35),
             null
         )
     }
 
     private fun parseTd3(lines: List<String>): RecognizedMrz? {
-        val first = validateLength(lines[0], 44)
-        val second = validateSecondLength(lines[1], 44, 2)
+        val lastTwoLines = lines.takeLast(2)
+        val first = getValidTD3FirstLine(lastTwoLines[0]) ?: return null
+        val second = validateSecondLength(lastTwoLines[1], TD3_LENGTH, 2)
+
+        // Check passport number controls sum
+        if (checkControlSum(second.subSequence(0, 9), Character.getNumericValue(second[9])).not()) return null
+
+        // Check date of birth control sum
+        if (checkControlSum(second.subSequence(13, 19), Character.getNumericValue(second[19])).not()) return null
+
+        // Check date of expiry control sum
+        if (checkControlSum(second.subSequence(21, 27), Character.getNumericValue(second[27])).not()) return null
 
         val checkStr = StringBuilder()
         checkStr.append(second.subSequence(0, 10))
         checkStr.append(second.subSequence(13, 20))
         checkStr.append(second.subSequence(21, 43))
 
+        // Check overall control sum
         if (checkControlSum(checkStr, Character.getNumericValue(second[43])).not()) return null
+
+        val nameSection = first.substring(5).split("<<")
+        val surname = nameSection.getOrNull(0)?.replace("<", " ")?.trim()
+        val givenNames = nameSection.getOrNull(1)?.replace("<", " ")?.trim()
 
         return RecognizedMrz(
             first + second,
@@ -129,20 +184,68 @@ object PassportMrzHelper {
             second.substring(20, 21),
             second.substring(21, 27),
             second.substring(10, 13),
-            null,
-            null,
+            surname,
+            givenNames,
             second.substring(28, 41),
             null)
     }
 
-    private fun validateLength(line: String, length: Int): String {
-        val str = StringBuilder(line)
-        val times = length - line.length
-        when {
-            times > 0 -> repeat(times) { str.append("<") }
-            times < 0 -> repeat(abs(times)) { str.deleteCharAt(str.length - 1) }
+    private fun getValidTD3FirstLine(line: String): String? {
+
+        val validated = validateLength(line, TD3_LENGTH).uppercase()
+
+        val validChars = Regex("^[A-Z0-9<]{44}$")
+        if (!validChars.matches(validated)) return null
+
+        if (validated[0] != 'P') return null
+
+        val countryCode = validated.substring(2, 5)
+        if (!countryCode.matches(Regex("^[A-Z]{3}$"))) return null
+
+        val firstDoubleFillerIndex = validated.indexOf("<<", 5)
+        if (firstDoubleFillerIndex == -1) return validated
+
+        val consecutiveFillersRegex = Regex("<{2,}")
+        val match = consecutiveFillersRegex.find(validated, firstDoubleFillerIndex + 2)
+        val cutOffIndex = match?.range?.first ?: -1
+        if (cutOffIndex != -1) {
+            return validated.substring(0, cutOffIndex).padEnd(TD3_LENGTH, '<')
         }
-        return str.toString()
+
+        return validated
+    }
+
+    private fun getValidTD2FirstLine(line: String): String? {
+
+        val validated = validateLength(line, TD2_LENGTH)
+
+        val validChars = Regex("^[A-Z0-9<]{36}$")
+        if (!validChars.matches(validated)) return null
+
+        if (validated[0] != 'P' && validated[0] != 'I') return null
+
+        val countryCode = validated.substring(2, 5)
+        if (!countryCode.matches(Regex("^[A-Z]{3}$"))) return null
+
+        val firstDoubleFillerIndex = validated.indexOf("<<", 5)
+        if (firstDoubleFillerIndex == -1) return validated
+
+        val consecutiveFillersRegex = Regex("<{2,}")
+        val match = consecutiveFillersRegex.find(validated, firstDoubleFillerIndex + 2)
+        val cutOffIndex = match?.range?.first ?: -1
+        if (cutOffIndex != -1) {
+            return validated.substring(0, cutOffIndex).padEnd(TD2_LENGTH, '<')
+        }
+
+        return validated
+    }
+
+    private fun validateLength(line: String, length: Int): String {
+        return when {
+            length > line.length -> line.padEnd(length, '<')
+            length < line.length -> line.substring(0, length)
+            else -> return line
+        }
     }
 
     private fun validateSecondLength(line: String, length: Int, position: Int): String {
