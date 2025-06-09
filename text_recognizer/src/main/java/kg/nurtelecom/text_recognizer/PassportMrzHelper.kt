@@ -28,7 +28,7 @@ object PassportMrzHelper {
         val text = if (isNonFullFirstLine(rawMrz)) rawMrz.padEnd(TD3_LENGTH, '<') else rawMrz
         return text
             .replace("«", "<")
-            .replace("[ces]".toRegex(), "<")
+            .replace("[ce]".toRegex(), "<")
             .replace("((?![A-Za-z0-9<]).)".toRegex(), "")
             .replace("\n", "")
             .replace("1D", "ID")
@@ -70,13 +70,13 @@ object PassportMrzHelper {
         val third = lines.getOrNull(2)?.let { validateLength(it, TD1_LENGTH) } ?: String()
 
         // Check first line -> 14(check number index): 5-14 (number sequence, index from - index to + 1)
-        if (checkControlSum(first.subSequence(5, 14), Character.getNumericValue(first[14])).not()) return null
+        if (checkControlSum(first.subSequence(5, 14), getCharNumericValue(first[14])).not()) return null
 
         // Check second line -> 36: 30-36
-        if (checkControlSum(second.subSequence(0, 6), Character.getNumericValue(second[6])).not()) return null
+        if (checkControlSum(second.subSequence(0, 6), getCharNumericValue(second[6])).not()) return null
 
         // Check second line -> 44: 38-44
-        if (checkControlSum(second.subSequence(8, 14), Character.getNumericValue(second[14])).not()) return null
+        if (checkControlSum(second.subSequence(8, 14), getCharNumericValue(second[14])).not()) return null
 
         val checkStr = StringBuilder()
         checkStr.append(first.subSequence(5, 30))
@@ -84,7 +84,7 @@ object PassportMrzHelper {
         checkStr.append(second.subSequence(8, 15))
         checkStr.append(second.subSequence(18, 29))
 
-        val checkDigit = Character.getNumericValue(second[29])
+        val checkDigit = getCharNumericValue(second[29])
         if (checkControlSum(checkStr, checkDigit).not()) return null
 
         val nameSection = third.split("<<")
@@ -112,13 +112,13 @@ object PassportMrzHelper {
         val second = validateSecondLength(lines[1], TD2_LENGTH, 1)
 
         // Check Passport number control sum
-        if (checkControlSum(second.subSequence(0, 9), Character.getNumericValue(second[9])).not()) return null
+        if (checkControlSum(second.subSequence(0, 9), getCharNumericValue(second[9])).not()) return null
 
         // Check Date of Birth control sum
-        if (checkControlSum(second.subSequence(13, 19), Character.getNumericValue(second[19])).not()) return null
+        if (checkControlSum(second.subSequence(13, 19), getCharNumericValue(second[19])).not()) return null
 
         // Check Date of Expiry control sum
-        if (checkControlSum(second.subSequence(21, 27), Character.getNumericValue(second[27])).not()) return null
+        if (checkControlSum(second.subSequence(21, 27), getCharNumericValue(second[27])).not()) return null
 
         val checkStr = StringBuilder()
         checkStr.append(second.subSequence(0, 10))
@@ -126,7 +126,7 @@ object PassportMrzHelper {
         checkStr.append(second.subSequence(21, 35))
 
         // Check overall control sum
-        val mainControlNumber = Character.getNumericValue(second[35])
+        val mainControlNumber = getCharNumericValue(second[35])
         if (checkControlSum(checkStr, mainControlNumber).not()) return null
 
         val nameSection = first.substring(5).split("<<")
@@ -155,13 +155,13 @@ object PassportMrzHelper {
         val second = validateSecondLength(lastTwoLines[1], TD3_LENGTH, 2)
 
         // Check passport number controls sum
-        if (checkControlSum(second.subSequence(0, 9), Character.getNumericValue(second[9])).not()) return null
+        if (checkControlSum(second.subSequence(0, 9), getCharNumericValue(second[9])).not()) return null
 
         // Check date of birth control sum
-        if (checkControlSum(second.subSequence(13, 19), Character.getNumericValue(second[19])).not()) return null
+        if (checkControlSum(second.subSequence(13, 19), getCharNumericValue(second[19])).not()) return null
 
         // Check date of expiry control sum
-        if (checkControlSum(second.subSequence(21, 27), Character.getNumericValue(second[27])).not()) return null
+        if (checkControlSum(second.subSequence(21, 27), getCharNumericValue(second[27])).not()) return null
 
         val checkStr = StringBuilder()
         checkStr.append(second.subSequence(0, 10))
@@ -169,7 +169,7 @@ object PassportMrzHelper {
         checkStr.append(second.subSequence(21, 43))
 
         // Check overall control sum
-        if (checkControlSum(checkStr, Character.getNumericValue(second[43])).not()) return null
+        if (checkControlSum(checkStr, getCharNumericValue(second[43])).not()) return null
 
         val nameSection = first.substring(5).split("<<")
         val surname = nameSection.getOrNull(0)?.replace("<", " ")?.trim()
@@ -278,6 +278,11 @@ object PassportMrzHelper {
 
     private fun isNumber(char: Char): Boolean {
         return char.code in 48..57
+    }
+
+    private fun getCharNumericValue(char: Char): Int {
+        return if(char == '<') 0
+        else Character.getNumericValue(char)
     }
 
     private fun getLetterAlphabetPosition(char: Char): Int {
