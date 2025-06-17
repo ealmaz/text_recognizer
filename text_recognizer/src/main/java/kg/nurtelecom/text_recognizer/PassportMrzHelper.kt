@@ -11,6 +11,10 @@ object PassportMrzHelper {
     private const val TD1_LENGTH = 30
 
     fun parseMrzFromRawText(rawText: Text): List<String> {
+        rawText.textBlocks.forEach {
+            println(it.text)
+        }
+        println("------------------>>")
         return rawText.textBlocks
             .flatMap { it.text.split("\n") }
             .filter {
@@ -41,6 +45,10 @@ object PassportMrzHelper {
     }
 
     fun getValidMrzData(lines: List<String>): RecognizedMrz? {
+        lines.forEach {
+            println(it)
+        }
+        println("------------------")
         val td3Lines = isTD3(lines)
         val td2Lines = isTD2(lines)
         return when {
@@ -151,8 +159,12 @@ object PassportMrzHelper {
 
     private fun parseTd3(lines: List<String>): RecognizedMrz? {
         val lastTwoLines = lines.takeLast(2)
-        val first = getValidTD3FirstLine(lastTwoLines[0]) ?: return null
-        val second = validateSecondLength(lastTwoLines[1], TD3_LENGTH, 2)
+        var first = getValidTD3FirstLine(lastTwoLines[0])
+        var second = getValidTD3SecondLine(lastTwoLines[1])
+        if (first == null) {
+            first = getValidTD3FirstLine(lastTwoLines[1]) ?: return null
+            second = getValidTD3SecondLine(lastTwoLines[0])
+        }
 
         // Check passport number controls sum
         if (checkControlSum(second.subSequence(0, 9), getCharNumericValue(second[9])).not()) return null
@@ -213,6 +225,17 @@ object PassportMrzHelper {
         }
 
         return validated
+    }
+
+    private fun getValidTD3SecondLine(line: String): String {
+        val validated = validateSecondLength(line, TD3_LENGTH, 2)
+        val str = StringBuilder().apply {
+            append(validated.substring(0, 13))
+            append(validated.substring(13, 28).replace(Regex("[Oo]"), "0"))
+            append(validated.substring(28, 42))
+            append(validated.substring(42, 44).replace(Regex("[Oo]"), "0"))
+        }
+        return str.toString()
     }
 
     private fun getValidTD2FirstLine(line: String): String? {
