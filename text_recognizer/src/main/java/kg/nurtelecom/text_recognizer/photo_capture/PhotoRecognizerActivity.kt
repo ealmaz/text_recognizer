@@ -36,7 +36,6 @@ class PhotoRecognizerActivity : AppCompatActivity(), PhotoRecognizerActivityCall
     override fun openCameraFragment(needRecognition: Boolean) {
         val cameraFragment = PhotoCaptureFragment().apply {
             arguments = bundleOf(
-                PhotoCaptureFragment.ARG_IS_SIMPLIFIED_RECOGNITION to textRecognizerConfig?.isSimplifiedRecognition,
                 PhotoCaptureFragment.ARG_NEED_RECOGNITION to needRecognition,
                 PhotoCaptureFragment.ARG_TIMEOUT_COUNT to textRecognizerConfig?.timeoutLimit,
                 PhotoCaptureFragment.ARG_TIMEOUT_MILLS to textRecognizerConfig?.timeoutMills,
@@ -179,8 +178,7 @@ data class TextRecognizerConfig(
     val overlayType: OverlayType? = OverlayType.PASSPORT_OVERLAY,
     val hasCustomPhotoConfirmation: Boolean = false,
     val needRecognition: Boolean = true,
-    val passportMask: PassportMask = PassportMask.SIMPLE_GRAY_PASSPORT_MASK,
-    val isSimplifiedRecognition: Boolean = false
+    val passportMask: PassportMask = PassportMask.SIMPLE_GRAY_PASSPORT_MASK
 ) : Serializable
 
 enum class PassportMask {
