@@ -42,7 +42,7 @@
             style="@style/Chili.ButtonStyle.Additional"
             android:layout_marginHorizontal="@dimen/padding_16dp"/>
 
-        <com.design2.chili2.view.buttons.LoaderButton
+        <com.design2.chili2.view.buttons.ChiliButton
             android:id="@+id/btn_primary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
