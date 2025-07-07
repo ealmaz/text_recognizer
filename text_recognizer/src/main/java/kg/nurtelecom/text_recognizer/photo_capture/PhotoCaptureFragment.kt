@@ -200,7 +200,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             }
 
 
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+        val cameraSelector = CameraSelector.Builder()
+            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
+            .build()
 
         try {
             cameraProvider.unbindAll()
@@ -217,6 +219,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             setUpTapToFocus(camera.cameraControl)
 
         } catch (exc: Exception) {
+            exc.printStackTrace()
             Log.e(TAG, "Use case binding failed", exc)
         }
 
@@ -237,7 +240,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                     .let { FocusMeteringAction.Builder(it, FocusMeteringAction.FLAG_AF).build() }
                 cameraControl.startFocusAndMetering(action)
                 true
-            } catch (_: Exception) {
+            } catch (ex: Exception) {
+                ex.printStackTrace()
                 false
             }
         }
