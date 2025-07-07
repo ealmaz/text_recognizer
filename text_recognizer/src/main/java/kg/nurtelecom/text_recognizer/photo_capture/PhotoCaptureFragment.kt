@@ -194,6 +194,8 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
 
         val imageAnalysis = ImageAnalysis.Builder()
+            .setTargetRotation(rotation)
+            .setTargetAspectRatio(aspectRatio)
             .build()
             .apply {
                 setAnalyzer(cameraExecutor, imageAnalyzer)
@@ -204,19 +206,21 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
         try {
             cameraProvider.unbindAll()
-            if (needToRecognizeText) {
-                cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis)
-                countDownTimer.start()
+            val useCases = mutableListOf(preview, imageCapture).also {
+                if (needToRecognizeText) {
+                    it += imageAnalysis
+                    countDownTimer.start()
+                }
             }
             val camera = cameraProvider.bindToLifecycle(
                 this,
                 cameraSelector,
-                preview,
-                imageCapture
+                *useCases.toTypedArray()
             )
             setUpTapToFocus(camera.cameraControl)
 
         } catch (exc: Exception) {
+            exc.printStackTrace()
             Log.e(TAG, "Use case binding failed", exc)
         }
 
@@ -237,7 +241,9 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
                     .let { FocusMeteringAction.Builder(it, FocusMeteringAction.FLAG_AF).build() }
                 cameraControl.startFocusAndMetering(action)
                 true
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to start focus and metering.", e)
+                e.printStackTrace()
                 false
             }
         }
