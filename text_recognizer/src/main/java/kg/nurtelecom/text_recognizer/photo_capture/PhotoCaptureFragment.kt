@@ -16,6 +16,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.AspectRatio
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
@@ -49,6 +50,8 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
+
+    private var camera: Camera? = null
 
     private var _vb: TextRecognizerFragmentPhotoCaptureBinding? = null
     private val vb: TextRecognizerFragmentPhotoCaptureBinding
@@ -207,19 +210,19 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         try {
             cameraProvider.unbindAll()
             if (needToRecognizeText) {
-                cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis)
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis)
                 countDownTimer.start()
+            } else {
+                camera = cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview,
+                    imageCapture
+                )
             }
-            val camera = cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture
-            )
-            setUpTapToFocus(camera.cameraControl)
+            camera?.cameraControl?.let { setUpTapToFocus(it) }
 
         } catch (exc: Exception) {
-            exc.printStackTrace()
             Log.e(TAG, "Use case binding failed", exc)
         }
 
