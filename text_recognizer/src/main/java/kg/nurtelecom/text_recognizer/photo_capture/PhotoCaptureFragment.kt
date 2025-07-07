@@ -209,7 +209,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
 
         try {
             cameraProvider.unbindAll()
-            if (needToRecognizeText) {
+            if (false) {
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis)
                 countDownTimer.start()
             } else {
