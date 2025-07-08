@@ -27,6 +27,8 @@ object MrzHelper {
             .replace("1D", "ID")
             .replace("(K6Z|K62|KG2)".toRegex(), "KGZ")
             .replace("(IDO|IDО)".toRegex(), "ID0")
+            .replace("ANO".toRegex(), "AN0")
+            .replace("OKGZ".toRegex(), "0KGZ")
     }
 
     fun isMrzValid(mrz: String): RecognizedMrz? {
