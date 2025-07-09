@@ -208,16 +208,16 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             cameraProvider.unbindAll()
             Thread.sleep(500)
             if (needToRecognizeText) {
-                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
+                cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis)
                 countDownTimer.start()
-            } else {
-                camera = cameraProvider.bindToLifecycle(
-                    this,
-                    cameraSelector,
-                    preview,
-                    imageCapture
-                )
             }
+            camera = cameraProvider.bindToLifecycle(
+                this,
+                cameraSelector,
+                preview,
+                imageCapture
+            )
+
             camera?.cameraControl?.let { setUpTapToFocus(it) }
 
         } catch (exc: Exception) {
