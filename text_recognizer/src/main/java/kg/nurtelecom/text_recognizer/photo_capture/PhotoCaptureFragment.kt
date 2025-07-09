@@ -16,7 +16,6 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.AspectRatio
-import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
@@ -25,6 +24,7 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.SurfaceOrientedMeteringPointFactory
+import androidx.camera.core.UseCase
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.toRect
@@ -56,7 +56,6 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         get () = _vb!!
 
     private var previewOverlay: View? = null
-    private var camera: Camera? = null
 
     private val timeoutCountLimit: Int by lazy {
         arguments?.getInt(ARG_TIMEOUT_COUNT) ?: 0
@@ -207,19 +206,16 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         try {
             cameraProvider.unbindAll()
             Thread.sleep(300)
+            val useCases = mutableListOf<UseCase>()
             if (needToRecognizeText) {
-                cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis)
+                useCases.add(imageAnalysis)
                 countDownTimer.start()
             }
-            Thread.sleep(300)
-            camera = cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture
-            )
+            useCases.add(preview)
+            useCases.add(imageCapture!!)
 
-            camera?.cameraControl?.let { setUpTapToFocus(it) }
+            val camera = cameraProvider.bindToLifecycle(this, cameraSelector, *useCases.toTypedArray())
+            setUpTapToFocus(camera.cameraControl)
 
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
