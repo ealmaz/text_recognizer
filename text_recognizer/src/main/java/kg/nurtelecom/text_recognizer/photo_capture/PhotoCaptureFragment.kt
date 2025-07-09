@@ -16,6 +16,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.AspectRatio
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraControl
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.FocusMeteringAction
@@ -55,6 +56,7 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
         get () = _vb!!
 
     private var previewOverlay: View? = null
+    private var camera: Camera? = null
 
     private val timeoutCountLimit: Int by lazy {
         arguments?.getInt(ARG_TIMEOUT_COUNT) ?: 0
@@ -206,16 +208,17 @@ class PhotoCaptureFragment : Fragment(), ImageAnalyzerCallback {
             cameraProvider.unbindAll()
             Thread.sleep(500)
             if (needToRecognizeText) {
-                cameraProvider.bindToLifecycle(this, cameraSelector, imageAnalysis)
+                camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
                 countDownTimer.start()
+            } else {
+                camera = cameraProvider.bindToLifecycle(
+                    this,
+                    cameraSelector,
+                    preview,
+                    imageCapture
+                )
             }
-            val camera = cameraProvider.bindToLifecycle(
-                this,
-                cameraSelector,
-                preview,
-                imageCapture
-            )
-            setUpTapToFocus(camera.cameraControl)
+            camera?.cameraControl?.let { setUpTapToFocus(it) }
 
         } catch (exc: Exception) {
             Log.e(TAG, "Use case binding failed", exc)
